@@ -1,0 +1,74 @@
+services:
+  app:
+    build: .
+    container_name: bff-aprendizaje-postulante
+    environment:
+      SPRING_PROFILES_ACTIVE: dev
+      LOG_PATH: /tmp
+      APRENDIZAJE_POSTULACION_SERVICE_URL: ${APRENDIZAJE_POSTULACION_SERVICE_URL:-http://3.233.245.157:81}
+    ports:
+      - "8081:8081"
+    labels:
+      logging: "promtail"
+      service: "bff-aprendizaje-postulante"
+    networks:
+      - oece-network
+
+  prometheus:
+    image: prom/prometheus:v2.47.0
+    container_name: oece-prometheus
+    volumes:
+      - ./docker/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+    ports:
+      - "9090:9090"
+    networks:
+      - oece-network
+
+  loki:
+    image: grafana/loki:2.9.8
+    container_name: oece-loki
+    command: -config.file=/etc/loki/local-config.yml
+    volumes:
+      - ./docker/loki/loki-config.yml:/etc/loki/local-config.yml:ro
+      - loki-data:/loki
+    ports:
+      - "3100:3100"
+    networks:
+      - oece-network
+
+  promtail:
+    image: grafana/promtail:2.9.8
+    container_name: oece-promtail
+    command: -config.file=/etc/promtail/config.yml
+    volumes:
+      - ./docker/promtail/promtail-config.yml:/etc/promtail/config.yml:ro
+      - ./logs:/workspace-logs:ro
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - promtail-positions:/tmp
+    depends_on:
+      - loki
+    networks:
+      - oece-network
+
+  grafana:
+    image: grafana/grafana:10.1.0
+    container_name: oece-grafana
+    depends_on:
+      - prometheus
+      - loki
+    environment:
+      GF_SECURITY_ADMIN_PASSWORD: admin
+    volumes:
+      - ./docker/grafana/provisioning:/etc/grafana/provisioning:ro
+    ports:
+      - "3001:3001"
+    networks:
+      - oece-network
+
+volumes:
+  loki-data:
+  promtail-positions:
+
+networks:
+  oece-network:
+    driver: bridge
