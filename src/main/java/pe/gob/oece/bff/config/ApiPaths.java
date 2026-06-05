@@ -21,5 +21,7 @@ public final class ApiPaths {
     public static final String CERTIFICADO = APRENDIZAJE_POSTULACION_BASE + "/certificado";
     public static final String CURSO_ASIGNADO = APRENDIZAJE_POSTULACION_BASE + "/curso-asignado";
 
+    public static final String EJECUCION_EXAMEN = APRENDIZAJE_POSTULACION_BASE + "/ejecucion-examen";
+
     public static final String NIUBIZ_WEBHOOK = APRENDIZAJE_POSTULACION_BASE + "/niubiz/webhook/callback";
 }
