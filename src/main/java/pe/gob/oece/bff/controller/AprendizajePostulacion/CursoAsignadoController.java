@@ -12,7 +12,6 @@ import pe.gob.oece.bff.application.AprendizajePostulacion.Certificado.Certificad
 import pe.gob.oece.bff.application.AprendizajePostulacion.CursoAsignado.CursoAsignadoQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
 
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ApiPaths.CURSO_ASIGNADO)

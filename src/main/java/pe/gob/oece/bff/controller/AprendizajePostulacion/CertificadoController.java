@@ -11,7 +11,6 @@ import org.springframework.web.bind.annotation.*;
 import pe.gob.oece.bff.application.AprendizajePostulacion.Certificado.CertificadoQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
 
-@CrossOrigin(origins = "*")
 @RequiredArgsConstructor
 @RestController
 @RequestMapping(ApiPaths.CERTIFICADO)

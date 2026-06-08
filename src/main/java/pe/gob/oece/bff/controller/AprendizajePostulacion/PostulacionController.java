@@ -28,7 +28,6 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Seleccio
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.POSTULACIONES)
 @Tag(name = "Postulaciones", description = "API de postulación de aprendizaje")
