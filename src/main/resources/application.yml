@@ -7,10 +7,11 @@ spring:
   application:
     name: bff-aprendizaje-postulante
 
+ #preguntar sobre esto, el doc indica maximo de 10mb, pero HU's pueden necesitar mas
   servlet:
     multipart:
-      max-file-size: 5MB
-      max-request-size: 6MB
+      max-file-size: 10MB
+      max-request-size: 12MB
 
   profiles:
     active: ${SPRING_PROFILES_ACTIVE:local}
@@ -78,4 +79,13 @@ app:
       connect-timeout-ms: ${CONNECT_TIMEOUT_MS:5000}
       read-timeout-ms: ${READ_TIMEOUT_MS:5000}
       response-timeout-ms: ${RESPONSE_TIMEOUT_MS:8000}
+    #Esto se encarga de los archivos
+    control-archivos:
+      base-url: ${CONTROL_ARCHIVOS_SERVICE_URL:https://gestionusuario-api-gateway.oece.gob.pe/siseet-externo}
+      public-key: ${CONTROL_ARCHIVOS_PUBLIC_KEY:}
+      api-key: ${CONTROL_ARCHIVOS_API_KEY:}
+      jwt-token: ${CONTROL_ARCHIVOS_JWT_TOKEN:}
+      connect-timeout-ms: ${CONTROL_ARCHIVOS_CONNECT_TIMEOUT_MS:5000}
+      read-timeout-ms: ${CONTROL_ARCHIVOS_READ_TIMEOUT_MS:30000}
+      response-timeout-ms: ${CONTROL_ARCHIVOS_RESPONSE_TIMEOUT_MS:30000}
   

@@ -3,6 +3,9 @@ package pe.gob.oece.bff.infrastructure.client;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
 
@@ -107,6 +110,50 @@ public final class DownstreamWebClient {
                         webClient.put().uri(uri, uriVars).headers(applyHeaders(headers)),
                         body
                 ),
+                responseType
+        );
+    }
+
+    public <T> T patch(String uri, Object body, Map<String, String> headers, Class<T> responseType, Object... uriVars) {
+        return decode(
+                retrieveWithBody(
+                        webClient.patch().uri(uri, uriVars).headers(applyHeaders(headers)),
+                        body
+                ),
+                responseType
+        );
+    }
+    public <T> T postMultipart(
+            String uri,
+            MultipartBodyBuilder multipartBodyBuilder,
+            Map<String, String> headers,
+            Class<T> responseType,
+            Object... uriVars
+    ) {
+        return decode(
+                webClient.post()
+                        .uri(uri, uriVars)
+                        .headers(applyHeaders(headers))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                        .retrieve(),
+                responseType
+        );
+    }
+
+    public <T> T postMultipart(
+            Function<UriBuilder, URI> uriFunction,
+            MultipartBodyBuilder multipartBodyBuilder,
+            Map<String, String> headers,
+            Class<T> responseType
+    ) {
+        return decode(
+                webClient.post()
+                        .uri(uriFunction)
+                        .headers(applyHeaders(headers))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                        .retrieve(),
                 responseType
         );
     }
