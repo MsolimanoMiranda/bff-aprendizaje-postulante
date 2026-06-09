@@ -19,6 +19,7 @@ import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.reactive.function.client.WebClientRequestException;
 import org.springframework.web.reactive.function.client.WebClientResponseException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
+import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.domain.DomainException;
 import pe.gob.oece.bff.domain.NotFoundException;
 import pe.gob.oece.bff.shared.ApiProblemDetail;
@@ -132,6 +133,18 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(AccessDeniedException.class)
     public ResponseEntity<ApiProblemDetail> handleAccessDenied(AccessDeniedException ex, WebRequest request) {
         return buildProblem(HttpStatus.FORBIDDEN, "FORBIDDEN", "No tiene permisos para acceder a este recurso", request);
+    }
+
+    @ExceptionHandler(ResponseStatusException.class)
+    public ResponseEntity<ApiProblemDetail> handleResponseStatus(ResponseStatusException ex, WebRequest request) {
+        HttpStatus status = HttpStatus.valueOf(ex.getStatusCode().value());
+        String code = switch (status) {
+            case UNAUTHORIZED -> "UNAUTHORIZED";
+            case FORBIDDEN -> "FORBIDDEN";
+            case NOT_FOUND -> "NOT-FOUND";
+            default -> "REQUEST-ERROR";
+        };
+        return buildProblem(status, code, ex.getReason(), request);
     }
 
     @ExceptionHandler(MaxUploadSizeExceededException.class)

@@ -11,6 +11,7 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.reprogra
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.reprogramacion.RegistrarReprogramacionRequest;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
@@ -40,13 +41,13 @@ class ReprogramacionExamenesServiceTest {
 
     @Test
     void registrarReprogramacion_delega_en_client() {
-        var request = new RegistrarReprogramacionRequest(10L, 30L);
+        var request = new RegistrarReprogramacionRequest(100L, 30L);
         var response = objectMapper.createObjectNode().put("rpta", 1);
         when(client.registrarReprogramacion(request, "Bearer token")).thenReturn(response);
 
         var result = service.registrarReprogramacion(request, "Bearer token", "127.0.0.1");
 
         assertThat(result).isSameAs(response);
-        verify(client).registrarReprogramacion(request, "Bearer token");
+        verify(client).registrarReprogramacion(eq(request), eq("Bearer token"));
     }
 }

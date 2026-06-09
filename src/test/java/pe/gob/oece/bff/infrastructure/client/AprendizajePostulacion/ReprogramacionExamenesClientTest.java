@@ -46,7 +46,7 @@ class ReprogramacionExamenesClientTest {
         AtomicReference<ClientRequest> captured = new AtomicReference<>();
         ReprogramacionExamenesClient client = build(captured, HttpStatus.OK, "{}");
 
-        client.registrarReprogramacion(new RegistrarReprogramacionRequest(10L, 30L), "Bearer token");
+        client.registrarReprogramacion(new RegistrarReprogramacionRequest(100L, 30L), "Bearer token");
 
         assertThat(captured.get().method()).isEqualTo(HttpMethod.POST);
         assertThat(captured.get().headers().getFirst(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer token");

@@ -34,8 +34,8 @@ public class ReprogramacionExamenesService {
             String authorization,
             String ipOrigen
     ) {
-        logger.info("AUDIT op=registrarReprogramacion idSolicitudReprog={} idProgNueva={} ipOrigen={}",
-                solicitud.idSolicitudReprog(), solicitud.idProgExamenNueva(), ipOrigen);
+        logger.info("AUDIT op=registrarReprogramacion idPostulacion={} idProgNueva={} ipOrigen={}",
+                solicitud.idPostulacion(), solicitud.idProgExamenNueva(), ipOrigen);
         return reprogramacionExamenesClient.registrarReprogramacion(solicitud, authorization);
     }
 }

@@ -17,13 +17,14 @@ import pe.gob.oece.bff.config.GlobalExceptionHandler;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
 
 @WebMvcTest(controllers = ReprogramacionExamenesController.class)
-@AutoConfigureMockMvc(addFilters = false)
+@AutoConfigureMockMvc
 @TestPropertySource(properties = {
         "app.clients.aprendizaje-postulacion.base-url=http://fake-url"
 })
@@ -46,6 +47,7 @@ class ReprogramacionExamenesControllerTest {
         when(service.buscarProgramacionesDisponibles(any(), any(), any())).thenReturn(data);
 
         mockMvc.perform(get(ApiPaths.REPROGRAMACION_EXAMENES + "/programaciones-disponibles")
+                        .with(jwt())
                         .header("Authorization", "Bearer token")
                         .param("idLocal", "1")
                         .param("fechaDesde", "2026-06-01")
@@ -61,9 +63,10 @@ class ReprogramacionExamenesControllerTest {
         when(service.registrarReprogramacion(any(), any(), any())).thenReturn(data);
 
         mockMvc.perform(post(ApiPaths.REPROGRAMACION_EXAMENES + "/registrar")
+                        .with(jwt())
                         .header("Authorization", "Bearer token")
                         .contentType(MediaType.APPLICATION_JSON)
-                        .content("{\"idSolicitudReprog\":10,\"idProgExamenNueva\":30}"))
+                        .content("{\"idPostulacion\":100,\"idProgExamenNueva\":30}"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.rpta").value(1));
@@ -72,6 +75,7 @@ class ReprogramacionExamenesControllerTest {
     @Test
     void registrarReprogramacion_sin_ids_responde_400() throws Exception {
         mockMvc.perform(post(ApiPaths.REPROGRAMACION_EXAMENES + "/registrar")
+                        .with(jwt())
                         .contentType(MediaType.APPLICATION_JSON)
                         .content("{}"))
                 .andExpect(status().isBadRequest());

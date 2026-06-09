@@ -54,7 +54,8 @@ public class ReprogramacionExamenesController {
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = reprogramacionExamenesService.registrarReprogramacion(solicitud, authorization, ipOrigen);
+        JsonNode data = reprogramacionExamenesService.registrarReprogramacion(
+                solicitud, authorization, ipOrigen);
         return ApiWrapper.success(data, "Reprogramacion registrada", httpRequest.getRequestURI());
     }
 }

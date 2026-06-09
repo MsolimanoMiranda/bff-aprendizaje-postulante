@@ -47,6 +47,10 @@ public class SecurityConfig {
                 .requestMatchers(HttpMethod.POST, ApiPaths.POSTULANTE).permitAll()
                 .requestMatchers(ApiPaths.PUBLICO + "/**").permitAll()
                 .requestMatchers(ApiPaths.CERTIFICADO + "/**",ApiPaths.CERTIFICADO).permitAll()
+                .requestMatchers(
+                        HttpMethod.GET,
+                        ApiPaths.REPROGRAMACION_EXAMENES + "/programaciones-disponibles"
+                ).permitAll()
                 .requestMatchers("/ops/**", "/actuator/**").hasAuthority(ROLE_TECHOPS)
                 .requestMatchers("/api/**").authenticated()
                 .requestMatchers("/swagger-ui/**", "/swagger-ui.html", "/api-docs/**", "/api-docs").permitAll()
