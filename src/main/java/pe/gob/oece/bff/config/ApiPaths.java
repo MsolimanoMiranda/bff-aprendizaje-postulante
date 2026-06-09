@@ -23,6 +23,8 @@ public final class ApiPaths {
 
     public static final String EJECUCION_EXAMEN = APRENDIZAJE_POSTULACION_BASE + "/ejecucion-examen";
 
+    public static final String REPROGRAMACION_EXAMENES = APRENDIZAJE_POSTULACION_BASE + "/reprogramacion-examenes";
+
     public static final String ENCUESTA_SATISFACCION = APRENDIZAJE_POSTULACION_BASE + "/encuesta-satisfaccion";
 
     public static final String NIUBIZ_WEBHOOK = APRENDIZAJE_POSTULACION_BASE + "/niubiz/webhook/callback";

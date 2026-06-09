@@ -1,9 +1,13 @@
 package pe.gob.oece.bff.infrastructure.client.EjecucionExamen;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
@@ -11,6 +15,7 @@ import pe.gob.oece.bff.infrastructure.client.EjecucionExamen.dto.*;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class EjecucionExamenClient {
@@ -31,35 +36,35 @@ public class EjecucionExamenClient {
     }
 
     public JsonNode validarToken(ValidarTokenExamenRequest request) {
-        return http.post(BASE_PATH + "/validar-token", request, null, JsonNode.class);
+        return http.post(BASE_PATH + "/validar-token", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode iniciar(IniciarEjecucionExamenRequest request) {
-        return http.post(BASE_PATH + "/iniciar", request, null, JsonNode.class);
+        return http.post(BASE_PATH + "/iniciar", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode heartbeat(HeartbeatEjecucionExamenRequest request) {
-        return http.post(BASE_PATH + "/heartbeat", request, null, JsonNode.class);
+        return http.post(BASE_PATH + "/heartbeat", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode guardarRespuestas(GuardarRespuestasRequest request) {
-        return http.post(BASE_PATH + "/examen/guardar-respuestas", request, null, JsonNode.class);
+        return http.post(BASE_PATH + "/examen/guardar-respuestas", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode listarCursosRecomendados(List<Long> idsCompetencia) {
-        return http.post(BASE_PATH + "/examen/cursos-recomendados", idsCompetencia, null, JsonNode.class);
+        return http.post(BASE_PATH + "/examen/cursos-recomendados", idsCompetencia, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode actualizarPreguntaActual(ActualizarPreguntaActualRequest request) {
-        return http.put(BASE_PATH + "/pregunta-actual", request, null, JsonNode.class);
+        return http.put(BASE_PATH + "/pregunta-actual", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode cambiarEstado(CambiarEstadoEjecucionRequest request) {
-        return http.put(BASE_PATH + "/estado", request, null, JsonNode.class);
+        return http.put(BASE_PATH + "/estado", request, authorizationHeader(), JsonNode.class);
     }
 
     public JsonNode obtenerPorExamen(Integer idExamen) {
-        return http.get(BASE_PATH + "/{idExamen}", null, JsonNode.class, idExamen);
+        return http.get(BASE_PATH + "/{idExamen}", authorizationHeader(), JsonNode.class, idExamen);
     }
 
     public JsonNode obtenerEstadoIndividual(Long idInscripcion) {
@@ -68,7 +73,7 @@ public class EjecucionExamenClient {
                         .path(BASE_PATH + "/examen/status")
                         .queryParam("idInscripcion", idInscripcion)
                         .build(),
-                null,
+                authorizationHeader(),
                 JsonNode.class
         );
     }
@@ -79,7 +84,7 @@ public class EjecucionExamenClient {
                         .path(BASE_PATH + "/examen/resultado")
                         .queryParam("idExamen", idExamen)
                         .build(),
-                null,
+                authorizationHeader(),
                 JsonNode.class
         );
     }
@@ -90,7 +95,7 @@ public class EjecucionExamenClient {
                         .path(BASE_PATH + "/examen/informacion")
                         .queryParam("idInscripcion", idInscripcion)
                         .build(),
-                null,
+                authorizationHeader(),
                 JsonNode.class
         );
     }
@@ -101,7 +106,7 @@ public class EjecucionExamenClient {
                         .path(BASE_PATH + "/examen/finalizar")
                         .queryParam("idExamen", idExamen)
                         .build(),
-                null,
+                authorizationHeader(),
                 JsonNode.class
         );
     }
@@ -112,8 +117,21 @@ public class EjecucionExamenClient {
                         .path(BASE_PATH + "/examen/Obtener")
                         .queryParam("idInscripcion", idInscripcion)
                         .build(),
-                null,
+                authorizationHeader(),
                 JsonNode.class
         );
+    }
+
+    private static Map<String, String> authorizationHeader() {
+        if (!(RequestContextHolder.getRequestAttributes() instanceof ServletRequestAttributes attributes)) {
+            return null;
+        }
+
+        HttpServletRequest request = attributes.getRequest();
+        String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authorization == null || authorization.isBlank()) {
+            return null;
+        }
+        return Map.of(HttpHeaders.AUTHORIZATION, authorization);
     }
 }

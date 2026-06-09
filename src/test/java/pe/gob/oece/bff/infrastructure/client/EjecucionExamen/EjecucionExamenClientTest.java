@@ -1,10 +1,15 @@
 package pe.gob.oece.bff.infrastructure.client.EjecucionExamen;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
+import org.springframework.http.HttpHeaders;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.test.util.ReflectionTestUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.DefaultUriBuilderFactory;
 import org.springframework.web.util.UriBuilder;
@@ -13,6 +18,7 @@ import pe.gob.oece.bff.infrastructure.client.EjecucionExamen.dto.*;
 
 import java.net.URI;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -42,6 +48,11 @@ class EjecucionExamenClientTest {
         ReflectionTestUtils.setField(client, "http", http);
     }
 
+    @AfterEach
+    void tearDown() {
+        RequestContextHolder.resetRequestAttributes();
+    }
+
     @Test
     void validarToken_debeHacerPostAlEndpointCorrecto() {
         ValidarTokenExamenRequest request = mock(ValidarTokenExamenRequest.class);
@@ -54,6 +65,26 @@ class EjecucionExamenClientTest {
         assertSame(response, result);
         verify(http).post(eq(BASE_PATH + "/validar-token"), same(request), isNull(), eq(JsonNode.class));
     }
+
+    @Test
+    void validarToken_debeReenviarAuthorizationDelRequestActual() {
+        MockHttpServletRequest servletRequest = new MockHttpServletRequest();
+        servletRequest.addHeader(HttpHeaders.AUTHORIZATION, "Bearer token");
+        RequestContextHolder.setRequestAttributes(new ServletRequestAttributes(servletRequest));
+        ValidarTokenExamenRequest request = mock(ValidarTokenExamenRequest.class);
+
+        when(http.post(eq(BASE_PATH + "/validar-token"), same(request), anyMap(), eq(JsonNode.class)))
+                .thenReturn(response);
+
+        JsonNode result = client.validarToken(request);
+
+        assertSame(response, result);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, String>> headersCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(http).post(eq(BASE_PATH + "/validar-token"), same(request), headersCaptor.capture(), eq(JsonNode.class));
+        assertEquals("Bearer token", headersCaptor.getValue().get(HttpHeaders.AUTHORIZATION));
+    }
+
 
     @Test
     void iniciar_debeHacerPostAlEndpointCorrecto() {
