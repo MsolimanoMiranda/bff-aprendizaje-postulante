@@ -24,7 +24,6 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.encuesta
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.ENCUESTA_SATISFACCION)
 @Tag(name = "Encuesta de satisfaccion", description = "BFF de encuesta de satisfaccion del examen")

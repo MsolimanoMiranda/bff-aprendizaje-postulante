@@ -18,7 +18,6 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Busqueda
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.PUBLICO)
 @Tag(name = "Público", description = "Endpoints accesibles sin autenticación")

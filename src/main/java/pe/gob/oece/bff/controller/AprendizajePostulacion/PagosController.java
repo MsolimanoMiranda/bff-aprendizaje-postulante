@@ -17,7 +17,6 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Respuest
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.NIUBIZ_WEBHOOK)
 @Tag(name = "Pagos", description = "Webhooks de pasarelas de pago (Niubiz)")

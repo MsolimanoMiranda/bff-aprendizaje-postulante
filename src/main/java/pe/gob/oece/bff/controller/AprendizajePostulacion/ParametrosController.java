@@ -15,7 +15,6 @@ import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.PARAMETROS)
 @Tag(name = "Parámetros", description = "Consulta de parámetros de configuración del sistema")
