@@ -82,10 +82,10 @@ app:
     #Esto se encarga de los archivos
     control-archivos:
       base-url: ${CONTROL_ARCHIVOS_SERVICE_URL:https://gestionusuario-api-gateway.oece.gob.pe/siseet-externo}
-      public-key: ${CONTROL_ARCHIVOS_PUBLIC_KEY:}
-      api-key: ${CONTROL_ARCHIVOS_API_KEY:}
+      public-key: ${CONTROL_ARCHIVOS_PUBLIC_KEY:seace4-service}
+      api-key: ${CONTROL_ARCHIVOS_API_KEY:SEC-ALi2xFUcvEGhBfAJOiTk0TyerX8iLkKvCsGBVhVbbQk}
       jwt-token: ${CONTROL_ARCHIVOS_JWT_TOKEN:}
+      app-name: ${CONTROL_ARCHIVOS_APP_NAME:CONFSEACE}
       connect-timeout-ms: ${CONTROL_ARCHIVOS_CONNECT_TIMEOUT_MS:5000}
       read-timeout-ms: ${CONTROL_ARCHIVOS_READ_TIMEOUT_MS:30000}
       response-timeout-ms: ${CONTROL_ARCHIVOS_RESPONSE_TIMEOUT_MS:30000}
-  

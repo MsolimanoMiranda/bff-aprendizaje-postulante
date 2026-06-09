@@ -12,6 +12,7 @@ public class ControlArchivosEndpoints {
     public static final String QUITAR_PERMISO = "/api/v1/documento/permiso/quitar";
 
     public static final String CREAR_EXPEDIENTE = "/api/v1/expediente/crear-expediente";
+    public static final String LEER_EXPEDIENTE = "/api/v1/expediente/leer-expediente";
 
     public static final String INSERTAR_ARCHIVO = "/api/v1/documentos/insertar";
     public static final String INSERTAR_ARCHIVO_TOKEN = "/api/v1/documento/insertar-archivo";

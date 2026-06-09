@@ -157,6 +157,23 @@ public final class DownstreamWebClient {
                 responseType
         );
     }
+    public <T> T putMultipart(
+            String uri,
+            MultipartBodyBuilder multipartBodyBuilder,
+            Map<String, String> headers,
+            Class<T> responseType,
+            Object... uriVars
+    ) {
+        return decode(
+                webClient.put()
+                        .uri(uri, uriVars)
+                        .headers(applyHeaders(headers))
+                        .contentType(MediaType.MULTIPART_FORM_DATA)
+                        .body(BodyInserters.fromMultipartData(multipartBodyBuilder.build()))
+                        .retrieve(),
+                responseType
+        );
+    }
 
     public <T> T delete(String uri, Map<String, String> headers, Class<T> responseType, Object... uriVars) {
         return decode(

@@ -2,19 +2,18 @@ package pe.gob.oece.bff.infrastructure.client.ControlArchivos;
 
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
-import pe.gob.oece.bff.config.ControlArchivosPropiedades;
 import pe.gob.oece.bff.infrastructure.client.ControlArchivos.dto.*;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
 
 import java.time.Duration;
+import java.util.HashMap;
 import java.util.Map;
 
 import static pe.gob.oece.bff.config.ControlArchivosEndpoints.*;
@@ -22,6 +21,7 @@ import static pe.gob.oece.bff.config.ControlArchivosEndpoints.*;
 @Component
 public class ControlArchivosClient {
 
+    private static final String HEADER_APP_NAME = "X-APP-NAME";
     private static final String HEADER_PUBLIC_KEY = "X-PUBLIC-KEY";
     private static final String HEADER_API_KEY = "X-API-KEY";
     private static final String BEARER_PREFIX = "Bearer ";
@@ -30,6 +30,7 @@ public class ControlArchivosClient {
     private static final String MULTIPART_DATA = "data";
 
     private final DownstreamWebClient http;
+    private final String appName;
     private final String publicKey;
     private final String apiKey;
     private final String jwtToken;
@@ -37,6 +38,7 @@ public class ControlArchivosClient {
     public ControlArchivosClient(
             @Qualifier("controlArchivosWebClient") WebClient webClient,
             @Value("${app.clients.control-archivos.response-timeout-ms:30000}") long timeoutMs,
+            @Value("${app.clients.control-archivos.app-name:CONFSEACE}") String appName,
             @Value("${app.clients.control-archivos.public-key}") String publicKey,
             @Value("${app.clients.control-archivos.api-key}") String apiKey,
             @Value("${app.clients.control-archivos.jwt-token:}") String jwtToken
@@ -46,6 +48,7 @@ public class ControlArchivosClient {
                 Duration.ofMillis(timeoutMs),
                 new DownstreamClientErrorHandler("control-archivos", "ERROR-CA")
         );
+        this.appName = appName;
         this.publicKey = publicKey;
         this.apiKey = apiKey;
         this.jwtToken = jwtToken;
@@ -106,6 +109,15 @@ public class ControlArchivosClient {
         );
     }
 
+    public LeerExpedienteResponse leerExpediente(LeerExpedienteRequest request) {
+        return http.post(
+                LEER_EXPEDIENTE,
+                request,
+                apiKeyHeaders(),
+                LeerExpedienteResponse.class
+        );
+    }
+
     public CrearCarpetaResponse crearCarpetaV2(CrearCarpetaV2Request request) {
         return http.post(
                 CREAR_CARPETA_V2,
@@ -125,26 +137,24 @@ public class ControlArchivosClient {
     }
 
     public byte[] descargarArchivo(String uuid, String nombre) {
-        return http.post(
+        return http.get(
                 uriBuilder -> uriBuilder
                         .path(DESCARGAR_ARCHIVO)
                         .queryParam("uuid", uuid)
                         .queryParam("nombre", nombre)
                         .build(),
-                null,
                 apiKeyHeaders(),
                 byte[].class
         );
     }
 
     public byte[] descargarArchivoConToken(String uuid, String nombre) {
-        return http.post(
+        return http.get(
                 uriBuilder -> uriBuilder
                         .path(DESCARGAR_ARCHIVO_TOKEN)
                         .queryParam("uuid", uuid)
                         .queryParam("nombre", nombre)
                         .build(),
-                null,
                 tokenHeaders(),
                 byte[].class
         );
@@ -178,7 +188,7 @@ public class ControlArchivosClient {
             ArchivoMultipart archivo,
             ActualizarArchivoRequest request
     ) {
-        return http.postMultipart(
+        return http.putMultipart(
                 ACTUALIZAR_ARCHIVO,
                 buildMultipartBody(archivo, request),
                 apiKeyHeaders(),
@@ -187,17 +197,19 @@ public class ControlArchivosClient {
     }
 
     private Map<String, String> apiKeyHeaders() {
-        return Map.of(
-                HEADER_PUBLIC_KEY, publicKey,
-                HEADER_API_KEY, apiKey
-        );
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HEADER_APP_NAME, appName);
+        headers.put(HEADER_PUBLIC_KEY, publicKey);
+        headers.put(HEADER_API_KEY, apiKey);
+        return headers;
     }
 
     private Map<String, String> tokenHeaders() {
-        return Map.of(
-                HEADER_PUBLIC_KEY, publicKey,
-                HttpHeaders.AUTHORIZATION, BEARER_PREFIX + jwtToken
-        );
+        Map<String, String> headers = new HashMap<>();
+        headers.put(HEADER_APP_NAME, appName);
+        headers.put(HEADER_PUBLIC_KEY, publicKey);
+        headers.put(HttpHeaders.AUTHORIZATION, BEARER_PREFIX + jwtToken);
+        return headers;
     }
 
     private MultipartBodyBuilder buildMultipartBody(
