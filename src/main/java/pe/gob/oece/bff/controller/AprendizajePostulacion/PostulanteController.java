@@ -22,7 +22,6 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Registro
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
-@CrossOrigin(origins = "*")
 @RestController
 @RequestMapping(ApiPaths.POSTULANTE)
 @Tag(name = "Postulante", description = "Registro y portal del postulante")
