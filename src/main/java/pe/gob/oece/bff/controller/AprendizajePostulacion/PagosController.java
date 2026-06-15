@@ -1,25 +1,22 @@
 package pe.gob.oece.bff.controller.AprendizajePostulacion;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
-import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PagosService;
 import pe.gob.oece.bff.config.ApiPaths;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.NiubizCallbackRequest;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.RespuestaSimple;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
 @RestController
-@RequestMapping(ApiPaths.NIUBIZ_WEBHOOK)
-@Tag(name = "Pagos", description = "Webhooks de pasarelas de pago (Niubiz)")
+@Tag(name = "Pagos", description = "Tasa SICAN y webhooks de pasarelas de pago (Niubiz)")
 public class PagosController {
 
     private final PagosService pagosService;
@@ -28,50 +25,75 @@ public class PagosController {
         this.pagosService = pagosService;
     }
 
-    @GetMapping
-    @Operation(summary = "Webhook callback Niubiz (GET)")
-    public ApiWrapper<RespuestaSimple> callbackNiubiz(
-            @RequestParam String purchaseNumber,
-            @RequestParam String status,
-            @RequestParam(required = false) String motivoDenegacion,
-            @RequestParam(required = false) String currency,
-            @RequestParam(required = false) String transactionDate,
-            @RequestParam(required = false) String montoAprobado,
+    // ── Tasa de pago ─────────────────────────────────────────────────────────
+
+    @GetMapping(ApiPaths.PAGOS + "/tasa")
+    @Operation(
+        summary = "Obtener tasa de pago SICAN",
+        description = "Retorna descripcion, monto, codigoCajaTupa y codigoPlan desde Pagos Electrónicos OECE.",
+        security = @SecurityRequirement(name = "bearer-jwt")
+    )
+    public ApiWrapper<JsonNode> obtenerTasa(
+            @RequestHeader("Authorization") String authorizationHeader,
             HttpServletRequest httpRequest
     ) {
-        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        RespuestaSimple data = pagosService.callbackNiubiz(
-                purchaseNumber,
-                status,
-                motivoDenegacion,
-                currency,
-                transactionDate,
-                montoAprobado,
-                ipOrigen
+        String bearerToken = authorizationHeader.startsWith("Bearer ")
+                ? authorizationHeader.substring(7)
+                : authorizationHeader;
+
+        JsonNode data = pagosService.obtenerTasa(bearerToken, HttpRequestUtils.obtenerIpOrigen(httpRequest));
+        return ApiWrapper.success(data, "Tasa de pago SICAN", httpRequest.getRequestURI());
+    }
+
+    // ── Niubiz webhook GET ────────────────────────────────────────────────────
+
+    @GetMapping(ApiPaths.NIUBIZ_WEBHOOK)
+    @Operation(
+        summary = "Webhook callback Niubiz (GET)",
+        description = "Niubiz llama a este endpoint al completar el pago. " +
+                      "postulacion e idPostulante son obligatorios para identificar la operación.",
+        security = @SecurityRequirement(name = "bearer-jwt")
+    )
+    public ApiWrapper<JsonNode> callbackNiubiz(
+            @RequestParam("postulacion")                        Long   idPostulacion,
+            @RequestParam("purchaseNumber")                     String purchaseNumber,
+            @RequestParam("status")                             String status,
+            @RequestParam(value = "motivoDenegacion", required = false) String motivoDenegacion,
+            @RequestParam(value = "currency",         required = false) String currency,
+            @RequestParam(value = "transactionDate",  required = false) String transactionDate,
+            @RequestParam(value = "montoAprobado",    required = false) String montoAprobado,
+            @RequestParam(value = "trama",            required = false) String trama,
+            HttpServletRequest httpRequest
+    ) {
+        JsonNode data = pagosService.callbackNiubiz(
+                idPostulacion, purchaseNumber, status,
+                motivoDenegacion, currency, transactionDate, montoAprobado, trama,
+                HttpRequestUtils.obtenerIpOrigen(httpRequest)
         );
         return ApiWrapper.success(data, "Callback Niubiz procesado", httpRequest.getRequestURI());
     }
 
-    @PostMapping
-    @Operation(summary = "Webhook callback Niubiz (POST)")
-    public ApiWrapper<RespuestaSimple> callbackNiubizPost(
-            @RequestBody(required = false) NiubizCallbackRequest body,
-            @RequestParam(required = false) String purchaseNumber,
-            @RequestParam(required = false) String status,
-            @RequestParam(required = false) String motivoDenegacion,
-            @RequestParam(required = false) String transactionDate,
-            @RequestParam(required = false) String montoAprobado,
+    // ── Niubiz webhook POST ───────────────────────────────────────────────────
+
+    @PostMapping(ApiPaths.NIUBIZ_WEBHOOK)
+    @Operation(
+        summary = "Webhook callback Niubiz (POST)",
+        security = @SecurityRequirement(name = "bearer-jwt")
+    )
+    public ApiWrapper<JsonNode> callbackNiubizPost(
+            @RequestParam("postulacion")                              Long   idPostulacion,
+            @RequestParam(value = "purchaseNumber",   required = false) String purchaseNumber,
+            @RequestParam(value = "status",           required = false) String status,
+            @RequestParam(value = "motivoDenegacion", required = false) String motivoDenegacion,
+            @RequestParam(value = "transactionDate",  required = false) String transactionDate,
+            @RequestParam(value = "montoAprobado",    required = false) String montoAprobado,
+            @RequestParam(value = "trama",            required = false) String trama,
             HttpServletRequest httpRequest
     ) {
-        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        RespuestaSimple data = pagosService.callbackNiubizPost(
-                body,
-                purchaseNumber,
-                status,
-                motivoDenegacion,
-                transactionDate,
-                montoAprobado,
-                ipOrigen
+        JsonNode data = pagosService.callbackNiubizPost(
+                idPostulacion, purchaseNumber, status,
+                motivoDenegacion, transactionDate, montoAprobado, trama,
+                HttpRequestUtils.obtenerIpOrigen(httpRequest)
         );
         return ApiWrapper.success(data, "Callback Niubiz procesado", httpRequest.getRequestURI());
     }
