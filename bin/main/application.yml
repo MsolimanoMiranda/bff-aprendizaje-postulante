@@ -74,7 +74,7 @@ springdoc:
 app:
   clients:
     aprendizaje-postulacion:
-      base-url: ${APRENDIZAJE_POSTULACION_SERVICE_URL:http://3.233.245.157:81}
+      base-url: ${APRENDIZAJE_POSTULACION_SERVICE_URL:http://localhost:81}
       connect-timeout-ms: ${CONNECT_TIMEOUT_MS:5000}
       read-timeout-ms: ${READ_TIMEOUT_MS:5000}
       response-timeout-ms: ${RESPONSE_TIMEOUT_MS:8000}

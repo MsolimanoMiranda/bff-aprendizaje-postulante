@@ -1,11 +1,10 @@
 package pe.gob.oece.bff.application.AprendizajePostulacion;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.PagosClient;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.NiubizCallbackRequest;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.RespuestaSimple;
 
 @Service
 public class PagosService {
@@ -18,35 +17,45 @@ public class PagosService {
         this.pagosClient = pagosClient;
     }
 
-    public RespuestaSimple callbackNiubiz(
+    public JsonNode obtenerTasa(String bearerToken, String ipOrigen) {
+        logger.info("AUDIT op=obtenerTasa ipOrigen={}", ipOrigen);
+        return pagosClient.obtenerTasa(bearerToken);
+    }
+
+    public JsonNode callbackNiubiz(
+            Long   idPostulacion,
             String purchaseNumber,
             String status,
             String motivoDenegacion,
             String currency,
             String transactionDate,
             String montoAprobado,
+            String trama,
             String ipOrigen
     ) {
-        logger.info("AUDIT op=callbackNiubizGet purchaseNumber={} status={} ipOrigen={}",
-                purchaseNumber, status, ipOrigen);
+        logger.info("AUDIT op=callbackNiubizGet idPostulacion={} purchaseNumber={} status={} ipOrigen={}",
+                idPostulacion, purchaseNumber, status, ipOrigen);
         return pagosClient.callbackNiubiz(
-                purchaseNumber, status, motivoDenegacion, currency, transactionDate, montoAprobado
+                idPostulacion, purchaseNumber, status,
+                motivoDenegacion, currency, transactionDate, montoAprobado, trama
         );
     }
 
-    public RespuestaSimple callbackNiubizPost(
-            NiubizCallbackRequest body,
+    public JsonNode callbackNiubizPost(
+            Long   idPostulacion,
             String purchaseNumber,
             String status,
             String motivoDenegacion,
             String transactionDate,
             String montoAprobado,
+            String trama,
             String ipOrigen
     ) {
-        logger.info("AUDIT op=callbackNiubizPost purchaseNumber={} status={} ipOrigen={}",
-                purchaseNumber, status, ipOrigen);
+        logger.info("AUDIT op=callbackNiubizPost idPostulacion={} purchaseNumber={} status={} ipOrigen={}",
+                idPostulacion, purchaseNumber, status, ipOrigen);
         return pagosClient.callbackNiubizPost(
-                body, purchaseNumber, status, motivoDenegacion, transactionDate, montoAprobado
+                idPostulacion, purchaseNumber, status,
+                motivoDenegacion, transactionDate, montoAprobado, trama
         );
     }
 }
