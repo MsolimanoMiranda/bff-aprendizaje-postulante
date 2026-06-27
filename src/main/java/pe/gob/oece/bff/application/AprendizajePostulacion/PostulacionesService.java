@@ -27,9 +27,9 @@ public class PostulacionesService {
         return postulacionClient.iniciarPostulacion(postulanteId, request);
     }
 
-    public JsonNode listarMisPostulaciones(Long postulanteId, String ipOrigen) {
+    public JsonNode listarMisPostulaciones(Long postulanteId, String token, String ipOrigen) {
         audit("listarMisPostulaciones", postulanteId, ipOrigen);
-        return postulacionClient.listarMisPostulaciones(postulanteId);
+        return postulacionClient.listarMisPostulaciones(postulanteId, token);
     }
 
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId, String ipOrigen) {

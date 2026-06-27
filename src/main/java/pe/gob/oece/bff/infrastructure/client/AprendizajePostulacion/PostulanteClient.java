@@ -3,6 +3,7 @@ package pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
@@ -38,20 +39,20 @@ public class PostulanteClient {
         return http.post(BASE_PATH, request, null, JsonNode.class);
     }
 
-    public JsonNode obtenerPerfilWizard(Long postulanteId, Long idPostulacion) {
+    public JsonNode obtenerPerfilWizard(Long postulanteId, Long idPostulacion, String token) {
         return http.get(
                 ub -> appendPerfilQuery(ub.path(PATH_PERFIL), idPostulacion).build(),
-                postulanteHeader(postulanteId),
+                postulanteHeader(postulanteId, token),
                 JsonNode.class
         );
     }
 
-    public JsonNode obtenerPerfilWizard(Long postulanteId) {
-        return obtenerPerfilWizard(postulanteId, null);
+    public JsonNode obtenerPerfilWizard(Long postulanteId, String token) {
+        return obtenerPerfilWizard(postulanteId, null, token);
     }
 
-    public JsonNode obtenerDashboard(Long postulanteId) {
-        return http.get(PATH_DASHBOARD, postulanteHeader(postulanteId), JsonNode.class);
+    public JsonNode obtenerDashboard(Long postulanteId, String token) {
+        return http.get(PATH_DASHBOARD, postulanteHeader(postulanteId, token), JsonNode.class);
     }
 
     private static UriBuilder appendPerfilQuery(UriBuilder ub, Long idPostulacion) {
@@ -63,5 +64,12 @@ public class PostulanteClient {
 
     private static Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
+    }
+
+    private static Map<String, String> postulanteHeader(Long postulanteId, String token) {
+        return Map.of(
+                HEADER_POSTULANTE_ID, String.valueOf(postulanteId),
+                HttpHeaders.AUTHORIZATION, "Bearer " + token
+        );
     }
 }

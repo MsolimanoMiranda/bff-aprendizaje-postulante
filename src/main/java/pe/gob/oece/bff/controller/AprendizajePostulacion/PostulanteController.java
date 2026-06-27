@@ -7,6 +7,8 @@ import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -16,6 +18,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PostulanteService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.RegistroPostulanteRequest;
@@ -53,10 +56,12 @@ public class PostulanteController {
     public ApiWrapper<JsonNode> obtenerPerfilWizard(
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
             @RequestParam(required = false) Long idPostulacion,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = postulanteService.obtenerPerfilWizard(postulanteId, idPostulacion, ipOrigen);
+        String token = obtenerToken(jwt);
+        JsonNode data = postulanteService.obtenerPerfilWizard(postulanteId, idPostulacion, token, ipOrigen);
         return ApiWrapper.success(data, "Perfil del postulante", httpRequest.getRequestURI());
     }
 
@@ -65,10 +70,19 @@ public class PostulanteController {
     @Operation(summary = "Dashboard del postulante")
     public ApiWrapper<JsonNode> obtenerDashboard(
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = postulanteService.obtenerDashboard(postulanteId, ipOrigen);
+        String token = obtenerToken(jwt);
+        JsonNode data = postulanteService.obtenerDashboard(postulanteId, token, ipOrigen);
         return ApiWrapper.success(data, "Dashboard del postulante", httpRequest.getRequestURI());
+    }
+
+    private static String obtenerToken(Jwt jwt) {
+        if (jwt == null || jwt.getTokenValue() == null || jwt.getTokenValue().isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
+        }
+        return jwt.getTokenValue();
     }
 }

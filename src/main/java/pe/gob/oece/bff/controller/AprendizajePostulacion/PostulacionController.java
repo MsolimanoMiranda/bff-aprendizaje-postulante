@@ -6,7 +6,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PostulacionesService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
@@ -59,10 +63,13 @@ public class PostulacionController {
     @Operation(summary = "Listar mis postulaciones")
     public ApiWrapper<JsonNode> listarMisPostulaciones(
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = postulacionesService.listarMisPostulaciones(postulanteId, ipOrigen);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.listarMisPostulaciones(postulanteId, token, ipOrigen);
         return ApiWrapper.success(data, "Postulaciones del postulante", httpRequest.getRequestURI());
     }
 
@@ -159,5 +166,17 @@ public class PostulacionController {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
         JsonNode data = postulacionesService.confirmarPostulacion(idPostulacion, postulanteId, request, ipOrigen);
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
+    }
+
+    private static String obtenerToken(Jwt jwt, String authorization) {
+        if (jwt != null && jwt.getTokenValue() != null && !jwt.getTokenValue().isBlank()) {
+            return jwt.getTokenValue();
+        }
+        if (authorization == null || authorization.isBlank()) {
+            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
+        }
+        return authorization.regionMatches(true, 0, "Bearer ", 0, 7)
+                ? authorization.substring(7).trim()
+                : authorization.trim();
     }
 }
