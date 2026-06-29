@@ -21,7 +21,6 @@ import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PostulacionesService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
@@ -31,6 +30,8 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.IniciarP
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.SeleccionarProgramacionRequest;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
 @RequestMapping(ApiPaths.POSTULACIONES)
@@ -168,15 +169,4 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
     }
 
-    private static String obtenerToken(Jwt jwt, String authorization) {
-        if (jwt != null && jwt.getTokenValue() != null && !jwt.getTokenValue().isBlank()) {
-            return jwt.getTokenValue();
-        }
-        if (authorization == null || authorization.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
-        }
-        return authorization.regionMatches(true, 0, "Bearer ", 0, 7)
-                ? authorization.substring(7).trim()
-                : authorization.trim();
-    }
 }

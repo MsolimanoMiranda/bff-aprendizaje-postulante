@@ -7,7 +7,6 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,11 +14,13 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.InvitacionTesteo.InvitacionTesteoService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerUsuario;
 
 @RestController
 @RequiredArgsConstructor
@@ -136,21 +137,4 @@ public class InvitacionTesteoController {
         return ApiWrapper.success(data, "Testeo completado", httpRequest.getRequestURI());
     }
 
-    private static String obtenerToken(Jwt jwt) {
-        if (jwt == null || jwt.getTokenValue() == null || jwt.getTokenValue().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
-        }
-        return jwt.getTokenValue();
-    }
-
-    private static String obtenerUsuario(Jwt jwt) {
-        String usuario = jwt != null ? jwt.getClaimAsString("idUsuario") : null;
-        if (usuario == null || usuario.isBlank()) {
-            usuario = jwt != null ? jwt.getSubject() : null;
-        }
-        if (usuario == null || usuario.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token sin usuario");
-        }
-        return usuario;
-    }
 }

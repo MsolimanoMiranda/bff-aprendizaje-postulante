@@ -18,12 +18,13 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PostulanteService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.RegistroPostulanteRequest;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
 @RequestMapping(ApiPaths.POSTULANTE)
@@ -79,10 +80,4 @@ public class PostulanteController {
         return ApiWrapper.success(data, "Dashboard del postulante", httpRequest.getRequestURI());
     }
 
-    private static String obtenerToken(Jwt jwt) {
-        if (jwt == null || jwt.getTokenValue() == null || jwt.getTokenValue().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
-        }
-        return jwt.getTokenValue();
-    }
 }
