@@ -3,6 +3,7 @@ package pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
@@ -39,8 +40,8 @@ public class PostulacionClient {
         return http.post(BASE_PATH, request, postulanteHeader(postulanteId), JsonNode.class);
     }
 
-    public JsonNode listarMisPostulaciones(Long postulanteId) {
-        return http.get(BASE_PATH, postulanteHeader(postulanteId), JsonNode.class);
+    public JsonNode listarMisPostulaciones(Long postulanteId, String token) {
+        return http.get(BASE_PATH, postulanteHeader(postulanteId, token), JsonNode.class);
     }
 
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId) {
@@ -132,5 +133,12 @@ public class PostulacionClient {
 
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
+    }
+
+    private Map<String, String> postulanteHeader(Long postulanteId, String token) {
+        return Map.of(
+                HEADER_POSTULANTE_ID, String.valueOf(postulanteId),
+                HttpHeaders.AUTHORIZATION, "Bearer " + token
+        );
     }
 }

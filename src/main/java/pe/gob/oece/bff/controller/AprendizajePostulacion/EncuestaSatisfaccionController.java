@@ -16,13 +16,14 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
 import pe.gob.oece.bff.application.AprendizajePostulacion.EncuestaSatisfaccion.EncuestaSatisfaccionCommandService;
 import pe.gob.oece.bff.application.AprendizajePostulacion.EncuestaSatisfaccion.EncuestaSatisfaccionQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.encuesta.EncuestaRespuestaRequest;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerIdUsuarioGu;
 
 @RestController
 @RequestMapping(ApiPaths.ENCUESTA_SATISFACCION)
@@ -63,17 +64,4 @@ public class EncuestaSatisfaccionController {
         return ApiWrapper.created(data, "Encuesta de satisfaccion registrada", httpRequest.getRequestURI());
     }
 
-    private static Long obtenerIdUsuarioGu(Jwt jwt) {
-        String idUsuarioGu = jwt != null ? jwt.getClaimAsString("idUsuario") : null;
-
-        if (idUsuarioGu == null || idUsuarioGu.isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token sin claim idUsuario");
-        }
-
-        try {
-            return Long.valueOf(idUsuarioGu);
-        } catch (NumberFormatException ex) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Claim idUsuario invalido");
-        }
-    }
 }

@@ -23,17 +23,17 @@ public class PostulanteService {
         return postulanteClient.registrarPostulante(request);
     }
 
-    public JsonNode obtenerPerfilWizard(Long postulanteId, Long idPostulacion, String ipOrigen) {
+    public JsonNode obtenerPerfilWizard(Long postulanteId, Long idPostulacion, String token, String ipOrigen) {
         logger.info("AUDIT op=obtenerPerfilWizard postulanteId={} ipOrigen={} idPostulacion={}",
                 postulanteId, ipOrigen, idPostulacion);
         if (idPostulacion == null) {
-            return postulanteClient.obtenerPerfilWizard(postulanteId);
+            return postulanteClient.obtenerPerfilWizard(postulanteId, token);
         }
-        return postulanteClient.obtenerPerfilWizard(postulanteId, idPostulacion);
+        return postulanteClient.obtenerPerfilWizard(postulanteId, idPostulacion, token);
     }
 
-    public JsonNode obtenerDashboard(Long postulanteId, String ipOrigen) {
+    public JsonNode obtenerDashboard(Long postulanteId, String token, String ipOrigen) {
         logger.info("AUDIT op=obtenerDashboard postulanteId={} ipOrigen={}", postulanteId, ipOrigen);
-        return postulanteClient.obtenerDashboard(postulanteId);
+        return postulanteClient.obtenerDashboard(postulanteId, token);
     }
 }

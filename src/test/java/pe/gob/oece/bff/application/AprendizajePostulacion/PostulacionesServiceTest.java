@@ -22,6 +22,7 @@ import static org.mockito.Mockito.when;
 class PostulacionesServiceTest {
 
     private static final String IP = "203.0.113.5";
+    private static final String TOKEN = "jwt-token";
 
     @Mock
     PostulacionClient postulacionClient;
@@ -42,10 +43,10 @@ class PostulacionesServiceTest {
 
     @Test
     void listarMisPostulaciones_delega() {
-        when(postulacionClient.listarMisPostulaciones(42L)).thenReturn(stub);
+        when(postulacionClient.listarMisPostulaciones(42L, TOKEN)).thenReturn(stub);
 
-        assertThat(service.listarMisPostulaciones(42L, IP)).isSameAs(stub);
-        verify(postulacionClient).listarMisPostulaciones(42L);
+        assertThat(service.listarMisPostulaciones(42L, TOKEN, IP)).isSameAs(stub);
+        verify(postulacionClient).listarMisPostulaciones(42L, TOKEN);
     }
 
     @Test

@@ -52,6 +52,20 @@ class PostulacionClientTest {
     }
 
     @Test
+    void listarMisPostulaciones_envia_GET_con_jwt() {
+        AtomicReference<ClientRequest> captured = new AtomicReference<>();
+        PostulacionClient client = build(captured, HttpStatus.OK, "[]");
+
+        client.listarMisPostulaciones(42L, "jwt-token");
+
+        ClientRequest req = captured.get();
+        assertThat(req.method()).isEqualTo(HttpMethod.GET);
+        assertThat(req.url().getPath()).isEqualTo("/api/v1/postulaciones");
+        assertThat(req.headers().getFirst("X-Postulante-Id")).isEqualTo("42");
+        assertThat(req.headers().getFirst(HttpHeaders.AUTHORIZATION)).isEqualTo("Bearer jwt-token");
+    }
+
+    @Test
     void eliminarExperiencia_envia_DELETE_con_path_compuesto() {
         AtomicReference<ClientRequest> captured = new AtomicReference<>();
         PostulacionClient client = build(captured, HttpStatus.OK, "{}");

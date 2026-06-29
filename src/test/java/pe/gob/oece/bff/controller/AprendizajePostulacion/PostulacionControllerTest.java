@@ -63,9 +63,11 @@ class PostulacionControllerTest {
     @Test
     void listarMisPostulaciones_responde_200_con_ApiWrapper_success() throws Exception {
         ObjectNode data = objectMapper.createObjectNode().put("total", 0);
-        when(postulacionesService.listarMisPostulaciones(eq(42L), any())).thenReturn(data);
+        when(postulacionesService.listarMisPostulaciones(eq(42L), eq("token-test"), any())).thenReturn(data);
 
-        mockMvc.perform(get(ApiPaths.POSTULACIONES).header("X-Postulante-Id", "42"))
+        mockMvc.perform(get(ApiPaths.POSTULACIONES)
+                        .header("Authorization", "Bearer token-test")
+                        .header("X-Postulante-Id", "42"))
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$.status").value(200))
                 .andExpect(jsonPath("$.data.total").value(0));

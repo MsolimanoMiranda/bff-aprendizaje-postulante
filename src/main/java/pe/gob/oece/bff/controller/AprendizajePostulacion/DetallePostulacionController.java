@@ -12,12 +12,12 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-import org.springframework.web.server.ResponseStatusException;
-import org.springframework.http.HttpStatus;
 import pe.gob.oece.bff.application.AprendizajePostulacion.DetallePostulacion.DetallePostulacionQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @CrossOrigin(origins = "*")
 @RestController
@@ -45,10 +45,4 @@ public class DetallePostulacionController {
         return ApiWrapper.success(data, "Detalle de postulacion", httpRequest.getRequestURI());
     }
 
-    private static String obtenerToken(Jwt jwt) {
-        if (jwt == null || jwt.getTokenValue() == null || jwt.getTokenValue().isBlank()) {
-            throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Token requerido");
-        }
-        return jwt.getTokenValue();
-    }
 }

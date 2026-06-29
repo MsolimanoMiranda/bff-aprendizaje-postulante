@@ -6,7 +6,10 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -27,6 +30,8 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.IniciarP
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.SeleccionarProgramacionRequest;
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
+
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
 @RequestMapping(ApiPaths.POSTULACIONES)
@@ -59,10 +64,13 @@ public class PostulacionController {
     @Operation(summary = "Listar mis postulaciones")
     public ApiWrapper<JsonNode> listarMisPostulaciones(
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = postulacionesService.listarMisPostulaciones(postulanteId, ipOrigen);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.listarMisPostulaciones(postulanteId, token, ipOrigen);
         return ApiWrapper.success(data, "Postulaciones del postulante", httpRequest.getRequestURI());
     }
 
@@ -160,4 +168,5 @@ public class PostulacionController {
         JsonNode data = postulacionesService.confirmarPostulacion(idPostulacion, postulanteId, request, ipOrigen);
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
     }
+
 }
