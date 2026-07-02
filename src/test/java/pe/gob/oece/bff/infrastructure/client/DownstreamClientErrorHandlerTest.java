@@ -22,7 +22,17 @@ class DownstreamClientErrorHandlerTest {
         RuntimeException ex = handler.mapError(HttpStatusCode.valueOf(404), "{\"detail\":\"no existe\"}");
 
         assertThat(ex).isInstanceOf(NotFoundException.class)
-                .hasMessageContaining("aprendizaje-postulacion");
+                .hasMessage("no existe");
+    }
+
+    @Test
+    void mapError_status404_conDetalleDevuelveNotFoundExceptionConMensajeDownstream() {
+        String body = "{\"detalle\":\"Esta ronda de test aun no ha sido programada, por favor regrese mas tarde\"}";
+
+        RuntimeException ex = handler.mapError(HttpStatusCode.valueOf(404), body);
+
+        assertThat(ex).isInstanceOf(NotFoundException.class)
+                .hasMessage("Esta ronda de test aun no ha sido programada, por favor regrese mas tarde");
     }
 
     @Test
