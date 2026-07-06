@@ -12,4 +12,8 @@ public class CertificadoQueryService {
     public JsonNode misCertificados(Long idPostulante){
         return certificacionClient.misCertificados(idPostulante);
     }
+
+    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen) {
+        return certificacionClient.obtenerDatosDescargaPorExamen(idExamen);
+    }
 }
