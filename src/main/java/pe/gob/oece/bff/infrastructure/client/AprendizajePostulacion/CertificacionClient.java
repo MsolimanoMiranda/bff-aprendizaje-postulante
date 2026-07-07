@@ -48,6 +48,16 @@ public class CertificacionClient {
 
     }
 
+    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen) {
+        logger.debug("GET {} idExamen={}", BASE_PATH + "/examen/{idExamen}/datos-descarga", idExamen);
+        return http.get(
+                BASE_PATH + "/examen/{idExamen}/datos-descarga",
+                null,
+                JsonNode.class,
+                idExamen
+        );
+    }
+
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
     }

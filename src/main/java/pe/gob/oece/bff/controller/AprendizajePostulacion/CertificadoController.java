@@ -29,4 +29,13 @@ public class CertificadoController {
     ) {
         return ResponseEntity.ok(certificadoQueryService.misCertificados(postulanteId));
     }
+
+    @GetMapping("/examen/{idExamen}/datos-descarga")
+    @Operation(summary = "Obtiene o crea datos de certificado por examen")
+    @Timed(value = "certificado.examen.datos-descarga")
+    public ResponseEntity<JsonNode> obtenerDatosDescargaPorExamen(
+            @PathVariable Long idExamen
+    ) {
+        return ResponseEntity.ok(certificadoQueryService.obtenerDatosDescargaPorExamen(idExamen));
+    }
 }
