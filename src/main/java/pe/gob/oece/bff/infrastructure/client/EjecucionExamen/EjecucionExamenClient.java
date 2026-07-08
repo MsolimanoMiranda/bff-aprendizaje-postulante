@@ -101,12 +101,16 @@ public class EjecucionExamenClient {
     }
 
     public JsonNode finalizar(Long idExamen) {
+        return finalizar(idExamen, null);
+    }
+
+    public JsonNode finalizar(Long idExamen, String authorization) {
         return http.get(
                 uriBuilder -> uriBuilder
                         .path(BASE_PATH + "/examen/finalizar")
                         .queryParam("idExamen", idExamen)
                         .build(),
-                authorizationHeader(),
+                authorizationHeader(authorization),
                 JsonNode.class
         );
     }
@@ -129,6 +133,13 @@ public class EjecucionExamenClient {
 
         HttpServletRequest request = attributes.getRequest();
         String authorization = request.getHeader(HttpHeaders.AUTHORIZATION);
+        if (authorization == null || authorization.isBlank()) {
+            return null;
+        }
+        return authorizationHeader(authorization);
+    }
+
+    private static Map<String, String> authorizationHeader(String authorization) {
         if (authorization == null || authorization.isBlank()) {
             return null;
         }

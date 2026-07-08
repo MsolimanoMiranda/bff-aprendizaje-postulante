@@ -13,7 +13,7 @@ public class CertificadoQueryService {
         return certificacionClient.misCertificados(idPostulante);
     }
 
-    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen) {
-        return certificacionClient.obtenerDatosDescargaPorExamen(idExamen);
+    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen, String authorization) {
+        return certificacionClient.obtenerDatosDescargaPorExamen(idExamen, authorization);
     }
 }

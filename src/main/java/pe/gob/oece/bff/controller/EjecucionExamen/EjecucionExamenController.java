@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.web.bind.annotation.*;
 import pe.gob.oece.bff.application.AprendizajePostulacion.EjecucionExamenService;
 import pe.gob.oece.bff.config.ApiPaths;
@@ -130,10 +131,11 @@ public class EjecucionExamenController {
     @Operation(summary = "Finalizar examen")
     public ApiWrapper<JsonNode> finalizar(
             @RequestParam Long idExamen,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = ejecucionExamenService.finalizar(idExamen, ipOrigen);
+        JsonNode data = ejecucionExamenService.finalizar(idExamen, ipOrigen, authorization);
         return ApiWrapper.success(data, "Examen finalizado", httpRequest.getRequestURI());
     }
 

@@ -122,12 +122,16 @@ public class EjecucionExamenService {
     }
 
     public JsonNode finalizar(Long idExamen, String ipOrigen) {
+        return finalizar(idExamen, ipOrigen, null);
+    }
+
+    public JsonNode finalizar(Long idExamen, String ipOrigen, String authorization) {
         logger.info(
                 "AUDIT op=finalizar idExamen={} ipOrigen={}",
                 idExamen,
                 ipOrigen
         );
-        return ejecucionExamenClient.finalizar(idExamen);
+        return ejecucionExamenClient.finalizar(idExamen, authorization);
     }
 
     public JsonNode obtenerPreguntasRespondidas(Long idInscripcion, String ipOrigen) {

@@ -5,6 +5,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
@@ -48,11 +49,11 @@ public class CertificacionClient {
 
     }
 
-    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen) {
+    public JsonNode obtenerDatosDescargaPorExamen(Long idExamen, String authorization) {
         logger.debug("GET {} idExamen={}", BASE_PATH + "/examen/{idExamen}/datos-descarga", idExamen);
         return http.get(
                 BASE_PATH + "/examen/{idExamen}/datos-descarga",
-                null,
+                authorizationHeader(authorization),
                 JsonNode.class,
                 idExamen
         );
@@ -60,6 +61,13 @@ public class CertificacionClient {
 
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
+    }
+
+    private Map<String, String> authorizationHeader(String authorization) {
+        if (authorization == null || authorization.isBlank()) {
+            return null;
+        }
+        return Map.of(HttpHeaders.AUTHORIZATION, authorization);
     }
 
 }
