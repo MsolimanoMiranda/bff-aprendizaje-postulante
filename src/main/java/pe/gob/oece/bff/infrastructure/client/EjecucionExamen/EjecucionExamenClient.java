@@ -67,6 +67,15 @@ public class EjecucionExamenClient {
         return http.get(BASE_PATH + "/{idExamen}", authorizationHeader(), JsonNode.class, idExamen);
     }
 
+    public JsonNode obtenerInscripcionPorId(Long idInscripcion) {
+        return http.get(
+                BASE_PATH + "/obtenerInscripcion/{idInscripcion}",
+                authorizationHeader(),
+                JsonNode.class,
+                idInscripcion
+        );
+    }
+
     public JsonNode obtenerEstadoIndividual(Long idInscripcion) {
         return http.get(
                 uriBuilder -> uriBuilder

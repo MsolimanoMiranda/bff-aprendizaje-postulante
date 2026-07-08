@@ -169,4 +169,15 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
     }
 
+    @PostMapping("/cancelar")
+    @Operation(summary = "Cancelar una postulaciÃ³n")
+    public ApiWrapper<JsonNode> cancelarPostulacion(
+            @Valid @RequestBody JsonNode request,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        JsonNode data = postulacionesService.cancelarPostulacion(request, ipOrigen);
+        return ApiWrapper.success(data, "PostulaciÃ³n cancelada", httpRequest.getRequestURI());
+    }
+
 }

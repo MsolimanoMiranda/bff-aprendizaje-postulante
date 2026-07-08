@@ -24,6 +24,11 @@ public class PublicoService {
         return publicoClient.buscarProgramaciones(solicitud);
     }
 
+    public JsonNode listarLocalesPorDepartamento(Long idDepartamento, String ipOrigen) {
+        logger.info("AUDIT op=listarLocalesPorDepartamento idDepartamento={} ipOrigen={}", idDepartamento, ipOrigen);
+        return publicoClient.listarLocalesPorDepartamento(idDepartamento);
+    }
+
     public JsonNode buscarCertificados(BusquedaCertificadoRequest solicitud, String ipOrigen) {
         logger.info("AUDIT op=buscarCertificados ipOrigen={}", ipOrigen);
         return publicoClient.buscarCertificados(solicitud);

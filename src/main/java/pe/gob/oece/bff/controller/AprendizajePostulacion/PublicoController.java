@@ -40,6 +40,17 @@ public class PublicoController {
         return ApiWrapper.success(data, "Programaciones públicas", httpRequest.getRequestURI());
     }
 
+    @GetMapping("/locales/departamento/{idDepartamento}")
+    @Operation(summary = "Listar locales por departamento")
+    public ApiWrapper<JsonNode> listarLocalesPorDepartamento(
+            @PathVariable Long idDepartamento,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        JsonNode data = publicoService.listarLocalesPorDepartamento(idDepartamento, ipOrigen);
+        return ApiWrapper.success(data, "Locales por departamento", httpRequest.getRequestURI());
+    }
+
     @GetMapping("/certificados")
     @Operation(summary = "Búsqueda pública de profesionales certificados")
     public ApiWrapper<JsonNode> buscarCertificados(

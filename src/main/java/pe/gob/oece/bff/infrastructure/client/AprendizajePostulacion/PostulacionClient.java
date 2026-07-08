@@ -131,6 +131,10 @@ public class PostulacionClient {
         );
     }
 
+    public JsonNode cancelarPostulacion(JsonNode request) {
+        return http.post(BASE_PATH + "/cancelar", request, null, JsonNode.class);
+    }
+
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
     }

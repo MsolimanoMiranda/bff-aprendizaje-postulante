@@ -55,6 +55,15 @@ public class PostulanteClient {
         return http.get(PATH_DASHBOARD, postulanteHeader(postulanteId, token), JsonNode.class);
     }
 
+    public JsonNode obtenerHistorialCertificados(Long idPostulante, String token) {
+        return http.get(
+                BASE_PATH + "/{idPostulante}/historial-certificados",
+                authorizationHeader(token),
+                JsonNode.class,
+                idPostulante
+        );
+    }
+
     private static UriBuilder appendPerfilQuery(UriBuilder ub, Long idPostulacion) {
         if (idPostulacion != null) {
             ub.queryParam("idPostulacion", idPostulacion);
@@ -71,5 +80,9 @@ public class PostulanteClient {
                 HEADER_POSTULANTE_ID, String.valueOf(postulanteId),
                 HttpHeaders.AUTHORIZATION, "Bearer " + token
         );
+    }
+
+    private static Map<String, String> authorizationHeader(String token) {
+        return Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     }
 }

@@ -8,8 +8,11 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
+import org.springframework.web.util.UriBuilder;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ActualizarCertificadoRequest;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.BusquedaCertificadoPostulanteRequest;
 
 import java.time.Duration;
 import java.util.HashMap;
@@ -49,6 +52,26 @@ public class CertificacionClient {
 
     }
 
+    public JsonNode buscar(BusquedaCertificadoPostulanteRequest solicitud) {
+        logger.debug("GET {}", BASE_PATH + "/buscar");
+        return http.get(
+                ub -> appendBuscarQuery(ub.path(BASE_PATH + "/buscar"), solicitud).build(),
+                null,
+                JsonNode.class
+        );
+    }
+
+    public JsonNode actualizar(Long idCertificado, ActualizarCertificadoRequest solicitud, String authorization) {
+        logger.debug("PUT {} idCertificado={}", BASE_PATH + "/{idCertificado}", idCertificado);
+        return http.put(
+                BASE_PATH + "/{idCertificado}",
+                solicitud,
+                authorizationHeader(authorization),
+                JsonNode.class,
+                idCertificado
+        );
+    }
+
     public JsonNode obtenerDatosDescargaPorExamen(Long idExamen, String authorization) {
         logger.debug("GET {} idExamen={}", BASE_PATH + "/examen/{idExamen}/datos-descarga", idExamen);
         return http.get(
@@ -68,6 +91,29 @@ public class CertificacionClient {
             return null;
         }
         return Map.of(HttpHeaders.AUTHORIZATION, authorization);
+    }
+
+    private static UriBuilder appendBuscarQuery(UriBuilder ub, BusquedaCertificadoPostulanteRequest r) {
+        queryParamIfPresent(ub, "tipoDocumento", r.tipoDocumento());
+        queryParamIfPresent(ub, "nDocumento", r.nDocumento());
+        queryParamIfPresent(ub, "apellidoPaterno", r.apellidoPaterno());
+        queryParamIfPresent(ub, "apellidoMaterno", r.apellidoMaterno());
+        queryParamIfPresent(ub, "nombres", r.nombres());
+        queryParamIfPresent(ub, "estadoCert", r.estadoCert());
+        queryParamIfPresent(ub, "idNivel", r.idNivel());
+        queryParamIfPresent(ub, "pagina", r.pagina());
+        queryParamIfPresent(ub, "tamano", r.tamano());
+        return ub;
+    }
+
+    private static void queryParamIfPresent(UriBuilder ub, String name, Object value) {
+        if (value == null) {
+            return;
+        }
+        if (value instanceof String s && s.isEmpty()) {
+            return;
+        }
+        ub.queryParam(name, value);
     }
 
 }

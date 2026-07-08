@@ -94,6 +94,15 @@ public class EjecucionExamenService {
         return ejecucionExamenClient.obtenerPorExamen(idExamen);
     }
 
+    public JsonNode obtenerInscripcionPorId(Long idInscripcion, String ipOrigen) {
+        logger.info(
+                "AUDIT op=obtenerInscripcionPorId idInscripcion={} ipOrigen={}",
+                idInscripcion,
+                ipOrigen
+        );
+        return ejecucionExamenClient.obtenerInscripcionPorId(idInscripcion);
+    }
+
     public JsonNode obtenerEstadoIndividual(Long idInscripcion, String ipOrigen) {
         logger.info(
                 "AUDIT op=obtenerEstadoIndividual idInscripcion={} ipOrigen={}",
