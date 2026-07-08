@@ -94,6 +94,17 @@ public class EjecucionExamenController {
         return ApiWrapper.success(data, "Ejecución de examen encontrada", httpRequest.getRequestURI());
     }
 
+    @GetMapping("/obtenerInscripcion/{idInscripcion}")
+    @Operation(summary = "Obtener inscripciÃ³n por ID")
+    public ApiWrapper<JsonNode> obtenerInscripcionPorId(
+            @PathVariable Long idInscripcion,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        JsonNode data = ejecucionExamenService.obtenerInscripcionPorId(idInscripcion, ipOrigen);
+        return ApiWrapper.success(data, "InscripciÃ³n encontrada", httpRequest.getRequestURI());
+    }
+
     @GetMapping("/examen/status")
     @Operation(summary = "Obtener estado individual del examen")
     public ApiWrapper<JsonNode> obtenerEstadoIndividual(

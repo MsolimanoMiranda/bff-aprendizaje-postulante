@@ -24,17 +24,17 @@ public class PostulacionesService {
 
     public JsonNode iniciarPostulacion(Long postulanteId, IniciarPostulacionRequest request, String ipOrigen) {
         audit("iniciarPostulacion", postulanteId, ipOrigen);
-        return postulacionClient.iniciarPostulacion(postulanteId, request);
+        return extraerData(postulacionClient.iniciarPostulacion(postulanteId, request));
     }
 
     public JsonNode listarMisPostulaciones(Long postulanteId, String token, String ipOrigen) {
         audit("listarMisPostulaciones", postulanteId, ipOrigen);
-        return postulacionClient.listarMisPostulaciones(postulanteId, token);
+        return extraerData(postulacionClient.listarMisPostulaciones(postulanteId, token));
     }
 
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId, String ipOrigen) {
         audit("obtenerDetalle", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return postulacionClient.obtenerDetalle(idPostulacion, postulanteId);
+        return extraerData(postulacionClient.obtenerDetalle(idPostulacion, postulanteId));
     }
 
     public JsonNode agregarExperiencia(
@@ -44,7 +44,7 @@ public class PostulacionesService {
             String ipOrigen
     ) {
         audit("agregarExperiencia", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return postulacionClient.agregarExperiencia(idPostulacion, postulanteId, request);
+        return extraerData(postulacionClient.agregarExperiencia(idPostulacion, postulanteId, request));
     }
 
     public JsonNode editarExperiencia(
@@ -56,7 +56,7 @@ public class PostulacionesService {
     ) {
         audit("editarExperiencia", postulanteId, ipOrigen,
                 "idPostulacion=" + idPostulacion, "idExperiencia=" + idExperiencia);
-        return postulacionClient.editarExperiencia(idPostulacion, idExperiencia, postulanteId, request);
+        return extraerData(postulacionClient.editarExperiencia(idPostulacion, idExperiencia, postulanteId, request));
     }
 
     public JsonNode eliminarExperiencia(
@@ -67,7 +67,7 @@ public class PostulacionesService {
     ) {
         audit("eliminarExperiencia", postulanteId, ipOrigen,
                 "idPostulacion=" + idPostulacion, "idExperiencia=" + idExperiencia);
-        return postulacionClient.eliminarExperiencia(idPostulacion, idExperiencia, postulanteId);
+        return extraerData(postulacionClient.eliminarExperiencia(idPostulacion, idExperiencia, postulanteId));
     }
 
     public JsonNode seleccionarProgramacion(
@@ -77,7 +77,7 @@ public class PostulacionesService {
             String ipOrigen
     ) {
         audit("seleccionarProgramacion", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return postulacionClient.seleccionarProgramacion(idPostulacion, postulanteId, request);
+        return extraerData(postulacionClient.seleccionarProgramacion(idPostulacion, postulanteId, request));
     }
 
     public JsonNode generarOrdenPago(
@@ -87,7 +87,7 @@ public class PostulacionesService {
             String ipOrigen
     ) {
         audit("generarOrdenPago", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return postulacionClient.generarOrdenPago(idPostulacion, postulanteId, request);
+        return extraerData(postulacionClient.generarOrdenPago(idPostulacion, postulanteId, request));
     }
 
     public JsonNode confirmarPostulacion(
@@ -97,7 +97,19 @@ public class PostulacionesService {
             String ipOrigen
     ) {
         audit("confirmarPostulacion", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return postulacionClient.confirmarPostulacion(idPostulacion, postulanteId, request);
+        return extraerData(postulacionClient.confirmarPostulacion(idPostulacion, postulanteId, request));
+    }
+
+    public JsonNode cancelarPostulacion(JsonNode request, String ipOrigen) {
+        logger.info("AUDIT op=cancelarPostulacion ipOrigen={}", ipOrigen);
+        return extraerData(postulacionClient.cancelarPostulacion(request));
+    }
+
+    private JsonNode extraerData(JsonNode response) {
+        if (response != null && response.has("data")) {
+            return response.get("data");
+        }
+        return response;
     }
 
     private static void audit(String operacion, Long postulanteId, String ipOrigen, String... extras) {

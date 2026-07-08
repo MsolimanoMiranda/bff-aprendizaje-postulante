@@ -36,4 +36,9 @@ public class PostulanteService {
         logger.info("AUDIT op=obtenerDashboard postulanteId={} ipOrigen={}", postulanteId, ipOrigen);
         return postulanteClient.obtenerDashboard(postulanteId, token);
     }
+
+    public JsonNode obtenerHistorialCertificados(Long idPostulante, String token, String ipOrigen) {
+        logger.info("AUDIT op=obtenerHistorialCertificados idPostulante={} ipOrigen={}", idPostulante, ipOrigen);
+        return postulanteClient.obtenerHistorialCertificados(idPostulante, token);
+    }
 }

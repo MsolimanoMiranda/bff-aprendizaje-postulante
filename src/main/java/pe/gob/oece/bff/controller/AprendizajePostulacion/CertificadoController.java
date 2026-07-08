@@ -11,6 +11,8 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.gob.oece.bff.application.AprendizajePostulacion.Certificado.CertificadoQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ActualizarCertificadoRequest;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.BusquedaCertificadoPostulanteRequest;
 
 @RequiredArgsConstructor
 @RestController
@@ -29,6 +31,26 @@ public class CertificadoController {
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId
     ) {
         return ResponseEntity.ok(certificadoQueryService.misCertificados(postulanteId));
+    }
+
+    @GetMapping("/buscar")
+    @Operation(summary = "Buscar certificados con datos del postulante")
+    @Timed(value = "certificado.buscar")
+    public ResponseEntity<JsonNode> buscar(
+            @ModelAttribute BusquedaCertificadoPostulanteRequest solicitud
+    ) {
+        return ResponseEntity.ok(certificadoQueryService.buscar(solicitud));
+    }
+
+    @PutMapping("/{idCertificado}")
+    @Operation(summary = "Actualizar certificado")
+    @Timed(value = "certificado.actualizar")
+    public ResponseEntity<JsonNode> actualizar(
+            @PathVariable Long idCertificado,
+            @RequestBody ActualizarCertificadoRequest solicitud,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
+    ) {
+        return ResponseEntity.ok(certificadoQueryService.actualizar(idCertificado, solicitud, authorization));
     }
 
     @GetMapping("/examen/{idExamen}/datos-descarga")

@@ -18,6 +18,7 @@ public class PublicoClient {
 
     private static final String PATH_PROGRAMACIONES = "/api/v1/publico/programaciones";
     private static final String PATH_CERTIFICADOS = "/api/v1/publico/certificados";
+    private static final String PATH_LOCALES = "/api/v1/publico/locales";
 
     private final DownstreamWebClient http;
 
@@ -45,6 +46,15 @@ public class PublicoClient {
                 ub -> appendCertificadoQuery(ub.path(PATH_CERTIFICADOS), solicitud).build(),
                 null,
                 JsonNode.class
+        );
+    }
+
+    public JsonNode listarLocalesPorDepartamento(Long idDepartamento) {
+        return http.get(
+                PATH_LOCALES + "/departamento/{idDepartamento}",
+                null,
+                JsonNode.class,
+                idDepartamento
         );
     }
 

@@ -11,6 +11,7 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
@@ -78,6 +79,20 @@ public class PostulanteController {
         String token = obtenerToken(jwt);
         JsonNode data = postulanteService.obtenerDashboard(postulanteId, token, ipOrigen);
         return ApiWrapper.success(data, "Dashboard del postulante", httpRequest.getRequestURI());
+    }
+
+    @GetMapping("/{idPostulante}/historial-certificados")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(summary = "Historial de certificaciones del postulante")
+    public ApiWrapper<JsonNode> obtenerHistorialCertificados(
+            @PathVariable Long idPostulante,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt);
+        JsonNode data = postulanteService.obtenerHistorialCertificados(idPostulante, token, ipOrigen);
+        return ApiWrapper.success(data, "Historial de certificados", httpRequest.getRequestURI());
     }
 
 }
