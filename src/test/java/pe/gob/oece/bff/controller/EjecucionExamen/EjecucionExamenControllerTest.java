@@ -21,6 +21,7 @@ import static org.mockito.Mockito.*;
 class EjecucionExamenControllerTest {
 
     private static final String IP_ORIGEN = "192.168.1.10";
+    private static final String AUTHORIZATION = "Bearer token";
 
     @Mock
     private EjecucionExamenService ejecucionExamenService;
@@ -153,12 +154,12 @@ class EjecucionExamenControllerTest {
     void finalizar_debeDelegarAlServiceYRetornarApiWrapper() {
         Long idExamen = 40L;
         when(httpRequest.getRequestURI()).thenReturn("/ejecucion-examen/examen/finalizar");
-        when(ejecucionExamenService.finalizar(eq(idExamen), eq(IP_ORIGEN))).thenReturn(data);
+        when(ejecucionExamenService.finalizar(eq(idExamen), eq(IP_ORIGEN), eq(AUTHORIZATION))).thenReturn(data);
 
-        ApiWrapper<JsonNode> result = controller.finalizar(idExamen, httpRequest);
+        ApiWrapper<JsonNode> result = controller.finalizar(idExamen, AUTHORIZATION, httpRequest);
 
         assertNotNull(result);
-        verify(ejecucionExamenService).finalizar(eq(idExamen), eq(IP_ORIGEN));
+        verify(ejecucionExamenService).finalizar(eq(idExamen), eq(IP_ORIGEN), eq(AUTHORIZATION));
     }
 
     @Test

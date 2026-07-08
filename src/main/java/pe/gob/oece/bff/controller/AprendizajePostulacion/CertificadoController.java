@@ -6,6 +6,7 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import pe.gob.oece.bff.application.AprendizajePostulacion.Certificado.CertificadoQueryService;
@@ -34,8 +35,9 @@ public class CertificadoController {
     @Operation(summary = "Obtiene o crea datos de certificado por examen")
     @Timed(value = "certificado.examen.datos-descarga")
     public ResponseEntity<JsonNode> obtenerDatosDescargaPorExamen(
-            @PathVariable Long idExamen
+            @PathVariable Long idExamen,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
     ) {
-        return ResponseEntity.ok(certificadoQueryService.obtenerDatosDescargaPorExamen(idExamen));
+        return ResponseEntity.ok(certificadoQueryService.obtenerDatosDescargaPorExamen(idExamen, authorization));
     }
 }

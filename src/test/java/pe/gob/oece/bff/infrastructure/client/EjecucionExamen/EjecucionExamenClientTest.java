@@ -230,6 +230,22 @@ class EjecucionExamenClientTest {
     }
 
     @Test
+    void finalizar_debeReenviarAuthorizationExplicito() {
+        Long idExamen = 77L;
+
+        when(http.get(anyUriFunction(), anyMap(), eq(JsonNode.class)))
+                .thenReturn(response);
+
+        JsonNode result = client.finalizar(idExamen, "Bearer token");
+
+        assertSame(response, result);
+        @SuppressWarnings("unchecked")
+        ArgumentCaptor<Map<String, String>> headersCaptor = ArgumentCaptor.forClass(Map.class);
+        verify(http).get(anyUriFunction(), headersCaptor.capture(), eq(JsonNode.class));
+        assertEquals("Bearer token", headersCaptor.getValue().get(HttpHeaders.AUTHORIZATION));
+    }
+
+    @Test
     void obtenerPreguntasRespondidas_debeHacerGetConQueryParamIdInscripcion() {
         Long idInscripcion = 66L;
 
