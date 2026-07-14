@@ -5,17 +5,21 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import org.springframework.web.util.UriBuilder;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.AlfrescoArchivoDownloadResponse;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ActualizarCertificadoRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.BusquedaCertificadoPostulanteRequest;
+import pe.gob.oece.bff.shared.ApiWrapper;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @Component
@@ -36,7 +40,7 @@ public class CertificacionClient {
     }
 
 
-    public JsonNode misCertificados(Long idPostulante) {
+    public JsonNode misCertificados(Long idPostulante, String authorization) {
         logger.debug("GET {} idPostulante={}", BASE_PATH + "/"+idPostulante+"/mis-certificaciones", idPostulante);
         Map<String, Object> queryParams = new HashMap<>();
         if (idPostulante != null && idPostulante!=0) {
@@ -45,9 +49,43 @@ public class CertificacionClient {
 
         return http.get(
                 BASE_PATH + "/{idPostulacion}/mis-certificaciones",
-                postulanteHeader(idPostulante),
+                authorizationHeader(authorization),
                 JsonNode.class,
                 idPostulante
+        );
+
+    }
+
+
+    public byte[] descargarTodos(Long idPostulante, String authorization) {
+        logger.debug("GET {} idPostulante={}", BASE_PATH + "/"+idPostulante+"/descargar-todos", idPostulante);
+        Map<String, Object> queryParams = new HashMap<>();
+        if (idPostulante != null && idPostulante!=0) {
+            queryParams.put("idPostulante", idPostulante);
+        }
+
+        return http.get(
+                BASE_PATH + "/{idPostulacion}/descargar-todos",
+                authorizationHeader(authorization),
+                byte[].class,
+                idPostulante
+        );
+
+    }
+
+
+    public byte[] descargarArchivoAlfresco(Long idCertificado, String authorization) {
+        logger.debug("GET {} idCertificado={}", BASE_PATH + "/"+idCertificado +"/alfresco/archivo", idCertificado);
+        Map<String, Object> queryParams = new HashMap<>();
+        if (idCertificado != null && idCertificado!=0) {
+            queryParams.put("idCertificado", idCertificado);
+        }
+
+        return http.get(
+                BASE_PATH + "/{idCertificado}/alfresco/archivo",
+                authorizationHeader(authorization),
+                byte[].class,
+                idCertificado
         );
 
     }

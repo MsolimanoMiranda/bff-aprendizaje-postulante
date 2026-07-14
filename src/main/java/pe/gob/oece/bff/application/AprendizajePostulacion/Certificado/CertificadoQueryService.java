@@ -5,14 +5,25 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.CertificacionClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ActualizarCertificadoRequest;
+import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.AlfrescoArchivoDownloadResponse;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.BusquedaCertificadoPostulanteRequest;
+import pe.gob.oece.bff.shared.ApiWrapper;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
 public class CertificadoQueryService {
     private final CertificacionClient certificacionClient;
-    public JsonNode misCertificados(Long idPostulante){
-        return certificacionClient.misCertificados(idPostulante);
+    public JsonNode misCertificados(Long idPostulante, String authorization){
+        return certificacionClient.misCertificados(idPostulante, authorization);
+    }
+
+    public byte[] descargarTodos(Long idPostulante, String authorization){
+        return certificacionClient.descargarTodos(idPostulante, authorization);
+    }
+    public byte[] descargarArchivoAlfresco(Long idCertificado, String authorization){
+        return certificacionClient.descargarArchivoAlfresco(idCertificado,authorization);
     }
 
     public JsonNode buscar(BusquedaCertificadoPostulanteRequest solicitud) {
