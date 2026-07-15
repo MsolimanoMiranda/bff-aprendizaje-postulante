@@ -20,6 +20,7 @@ public class PostulanteClient {
     private static final String BASE_PATH = "/api/v1/postulante";
     private static final String PATH_PERFIL = BASE_PATH + "/perfil";
     private static final String PATH_DASHBOARD = BASE_PATH + "/dashboard";
+    private static final String PATH_AULA_VIRTUAL_URL_LOGIN = BASE_PATH + "/aula-virtual/url-login";
     private static final String HEADER_POSTULANTE_ID = "X-Postulante-Id";
 
     private final DownstreamWebClient http;
@@ -53,6 +54,10 @@ public class PostulanteClient {
 
     public JsonNode obtenerDashboard(Long postulanteId, String token) {
         return http.get(PATH_DASHBOARD, postulanteHeader(postulanteId, token), JsonNode.class);
+    }
+
+    public JsonNode obtenerUrlLoginAulaVirtual(String token) {
+        return http.get(PATH_AULA_VIRTUAL_URL_LOGIN, authorizationHeader(token), JsonNode.class);
     }
 
     public JsonNode obtenerHistorialCertificados(Long idPostulante, String token) {
