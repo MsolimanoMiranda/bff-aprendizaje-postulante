@@ -120,6 +120,16 @@ public class CertificacionClient {
         );
     }
 
+    public byte[] descargarArchivoPorExamen(Long idExamen, String authorization) {
+        logger.debug("GET {} idExamen={}", BASE_PATH + "/examen/{idExamen}/archivo", idExamen);
+        return http.get(
+                BASE_PATH + "/examen/{idExamen}/archivo",
+                authorizationHeader(authorization),
+                byte[].class,
+                idExamen
+        );
+    }
+
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
     }
