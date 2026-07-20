@@ -39,4 +39,21 @@ public class PublicoService {
                 idCertificado, ipOrigen);
         return publicoClient.obtenerDetalleCertificado(idCertificado);
     }
+
+    public JsonNode verificarCertificadoPorHash(String hash, String ipOrigen) {
+        logger.info("AUDIT op=verificarCertificadoPorHash hash={} ipOrigen={}", hash, ipOrigen);
+        return extraerDataRespuesta(publicoClient.verificarCertificadoPorHash(hash));
+    }
+
+    public JsonNode verificarCertificadoPorCodigo(String codigo, String ipOrigen) {
+        logger.info("AUDIT op=verificarCertificadoPorCodigo codigo={} ipOrigen={}", codigo, ipOrigen);
+        return extraerDataRespuesta(publicoClient.verificarCertificadoPorCodigo(codigo));
+    }
+
+    private JsonNode extraerDataRespuesta(JsonNode respuesta) {
+        if (respuesta != null && respuesta.has("data")) {
+            return respuesta.get("data");
+        }
+        return respuesta;
+    }
 }

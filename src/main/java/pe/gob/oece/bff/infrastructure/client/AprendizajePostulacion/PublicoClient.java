@@ -18,6 +18,8 @@ public class PublicoClient {
 
     private static final String PATH_PROGRAMACIONES = "/api/v1/publico/programaciones";
     private static final String PATH_CERTIFICADOS = "/api/v1/publico/certificados";
+    private static final String PATH_VERIFICA_CERTIFICADO = "/api/v1/publico/verifica/certificado";
+    private static final String PATH_VERIFICA_CERTIFICADO_CODIGO = "/api/v1/publico/verifica/certificado-codigo";
     private static final String PATH_LOCALES = "/api/v1/publico/locales";
 
     private final DownstreamWebClient http;
@@ -64,6 +66,24 @@ public class PublicoClient {
                 null,
                 JsonNode.class,
                 idCertificado
+        );
+    }
+
+    public JsonNode verificarCertificadoPorHash(String hash) {
+        return http.get(
+                PATH_VERIFICA_CERTIFICADO + "/{hash}",
+                null,
+                JsonNode.class,
+                hash
+        );
+    }
+
+    public JsonNode verificarCertificadoPorCodigo(String codigo) {
+        return http.get(
+                PATH_VERIFICA_CERTIFICADO_CODIGO + "/{codigo}",
+                null,
+                JsonNode.class,
+                codigo
         );
     }
 

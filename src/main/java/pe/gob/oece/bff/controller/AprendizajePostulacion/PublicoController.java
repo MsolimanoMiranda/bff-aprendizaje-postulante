@@ -72,4 +72,26 @@ public class PublicoController {
         JsonNode data = publicoService.obtenerDetalleCertificado(idCertificado, ipOrigen);
         return ApiWrapper.success(data, "Detalle de certificado", httpRequest.getRequestURI());
     }
+
+    @GetMapping("/verifica/certificado/{hash}")
+    @Operation(summary = "Verificacion publica de certificado por hash")
+    public ApiWrapper<JsonNode> verificarCertificadoPorHash(
+            @PathVariable String hash,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        JsonNode data = publicoService.verificarCertificadoPorHash(hash, ipOrigen);
+        return ApiWrapper.success(data, "Verificacion de certificado", httpRequest.getRequestURI());
+    }
+
+    @GetMapping("/verifica/certificado-codigo/{codigo}")
+    @Operation(summary = "Verificacion publica de certificado por codigo")
+    public ApiWrapper<JsonNode> verificarCertificadoPorCodigo(
+            @PathVariable String codigo,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        JsonNode data = publicoService.verificarCertificadoPorCodigo(codigo, ipOrigen);
+        return ApiWrapper.success(data, "Verificacion de certificado", httpRequest.getRequestURI());
+    }
 }
