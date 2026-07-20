@@ -107,4 +107,22 @@ public class CertificadoController {
     ) {
         return ResponseEntity.ok(certificadoQueryService.obtenerDatosDescargaPorExamen(idExamen, authorization));
     }
+
+    @GetMapping("/examen/{idExamen}/archivo")
+    @Operation(summary = "Descarga el certificado del examen")
+    @Timed(value = "certificado.examen.archivo")
+    public ResponseEntity<byte[]> descargarArchivoPorExamen(
+            @PathVariable Long idExamen,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.attachment()
+                                .filename("certificado-" + idExamen + ".pdf")
+                                .build()
+                                .toString())
+                .body(certificadoQueryService.descargarArchivoPorExamen(idExamen, authorization));
+    }
 }

@@ -58,7 +58,7 @@ resilience4j:
   timelimiter:
     instances:
       default:
-        timeout-duration: 10s
+        timeout-duration: ${TIME_LIMITER_TIMEOUT_DURATION:120s}
   retry:
     instances:
       default:
@@ -75,7 +75,7 @@ app:
   clients:
     aprendizaje-postulacion:
       base-url: ${APRENDIZAJE_POSTULACION_SERVICE_URL:http://localhost:81}
-      connect-timeout-ms: ${CONNECT_TIMEOUT_MS:5000}
-      read-timeout-ms: ${READ_TIMEOUT_MS:5000}
-      response-timeout-ms: ${RESPONSE_TIMEOUT_MS:8000}
+      connect-timeout-ms: ${CONNECT_TIMEOUT_MS:30000}
+      read-timeout-ms: ${READ_TIMEOUT_MS:120000}
+      response-timeout-ms: ${RESPONSE_TIMEOUT_MS:120000}
   

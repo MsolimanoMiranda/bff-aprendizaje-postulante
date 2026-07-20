@@ -37,4 +37,8 @@ public class CertificadoQueryService {
     public JsonNode obtenerDatosDescargaPorExamen(Long idExamen, String authorization) {
         return certificacionClient.obtenerDatosDescargaPorExamen(idExamen, authorization);
     }
+
+    public byte[] descargarArchivoPorExamen(Long idExamen, String authorization) {
+        return certificacionClient.descargarArchivoPorExamen(idExamen, authorization);
+    }
 }
