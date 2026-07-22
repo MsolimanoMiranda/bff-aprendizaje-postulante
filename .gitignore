@@ -19,7 +19,9 @@ spring.log
 
 # Environment and local overrides
 .env
-.env.*
+.env.local
+.env.*.local
+!/.env.example
 application-local.yml
 application-local.yaml
 application-local.properties

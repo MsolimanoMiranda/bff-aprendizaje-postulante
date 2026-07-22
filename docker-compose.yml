@@ -2,9 +2,11 @@ services:
   app:
     build: .
     container_name: bff-aprendizaje-postulante
+    env_file:
+      - .env
     environment:
-      SPRING_PROFILES_ACTIVE: dev
-      LOG_PATH: /tmp
+      SPRING_PROFILES_ACTIVE: ${SPRING_PROFILES_ACTIVE:-dev}
+      LOG_PATH: ${LOG_PATH:-/tmp}
       APRENDIZAJE_POSTULACION_SERVICE_URL: ${APRENDIZAJE_POSTULACION_SERVICE_URL:-http://3.233.245.157:81}
     ports:
       - "8081:8081"
