@@ -169,6 +169,21 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
     }
 
+    @PostMapping("/{idPostulacion}/subsanacion/enviar")
+    @Operation(summary = "Enviar subsanacion de postulacion")
+    public ApiWrapper<JsonNode> enviarSubsanacion(
+            @PathVariable Long idPostulacion,
+            @Valid @RequestBody JsonNode request,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.enviarSubsanacion(idPostulacion, request, token, ipOrigen);
+        return ApiWrapper.success(data, "Subsanacion enviada", httpRequest.getRequestURI());
+    }
+
     @PostMapping("/cancelar")
     @Operation(summary = "Cancelar una postulaciÃ³n")
     public ApiWrapper<JsonNode> cancelarPostulacion(

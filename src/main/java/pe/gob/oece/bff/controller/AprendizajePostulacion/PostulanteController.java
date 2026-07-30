@@ -94,6 +94,21 @@ public class PostulanteController {
         return ApiWrapper.success(data, "URL de acceso al Aula Virtual", httpRequest.getRequestURI());
     }
 
+    @GetMapping("/documentos")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(summary = "Formacion academica y experiencia laboral del postulante autenticado")
+    public ApiWrapper<JsonNode> obtenerDocumentosPostulante(
+            @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
+            @RequestParam(required = false) Long idPostulacion,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt);
+        JsonNode data = postulanteService.obtenerDocumentosPostulante(postulanteId, idPostulacion, token, ipOrigen);
+        return ApiWrapper.success(data, "Documentos del postulante", httpRequest.getRequestURI());
+    }
+
     @GetMapping("/{idPostulante}/historial-certificados")
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(summary = "Historial de certificaciones del postulante")

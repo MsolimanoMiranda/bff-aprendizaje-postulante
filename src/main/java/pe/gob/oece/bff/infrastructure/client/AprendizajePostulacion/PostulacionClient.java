@@ -21,6 +21,7 @@ import java.util.Map;
 public class PostulacionClient {
 
     private static final String BASE_PATH = "/api/v1/postulaciones";
+    private static final String LISTAS_BASE_PATH = "/api/v1/listas";
     private static final String HEADER_POSTULANTE_ID = "X-Postulante-Id";
 
     private final DownstreamWebClient http;
@@ -131,8 +132,22 @@ public class PostulacionClient {
         );
     }
 
+    public JsonNode enviarSubsanacion(Long idPostulacion, JsonNode request, String token) {
+        return http.post(
+                BASE_PATH + "/{idPostulacion}/subsanacion/enviar",
+                request,
+                bearerHeader(token),
+                JsonNode.class,
+                idPostulacion
+        );
+    }
+
     public JsonNode cancelarPostulacion(JsonNode request) {
         return http.post(BASE_PATH + "/cancelar", request, null, JsonNode.class);
+    }
+
+    public JsonNode listarPorTipoLista(String tipo) {
+        return http.get(LISTAS_BASE_PATH + "/{tipo}", null, JsonNode.class, tipo);
     }
 
     private Map<String, String> postulanteHeader(Long postulanteId) {
@@ -144,5 +159,9 @@ public class PostulacionClient {
                 HEADER_POSTULANTE_ID, String.valueOf(postulanteId),
                 HttpHeaders.AUTHORIZATION, "Bearer " + token
         );
+    }
+
+    private Map<String, String> bearerHeader(String token) {
+        return Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     }
 }

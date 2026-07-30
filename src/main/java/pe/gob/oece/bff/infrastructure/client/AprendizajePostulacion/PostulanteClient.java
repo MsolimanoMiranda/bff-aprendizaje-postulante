@@ -60,6 +60,18 @@ public class PostulanteClient {
         return http.get(PATH_AULA_VIRTUAL_URL_LOGIN, authorizationHeader(token), JsonNode.class);
     }
 
+    public JsonNode obtenerDocumentosPostulante(Long idPostulante, Long idPostulacion, String token) {
+        return http.get(
+                ub -> appendDocumentosQuery(
+                        ub.path(BASE_PATH + "/documentos"),
+                        idPostulante,
+                        idPostulacion
+                ).build(),
+                authorizationHeader(token),
+                JsonNode.class
+        );
+    }
+
     public JsonNode obtenerHistorialCertificados(Long idPostulante, String token) {
         return http.get(
                 BASE_PATH + "/{idPostulante}/historial-certificados",
@@ -70,6 +82,14 @@ public class PostulanteClient {
     }
 
     private static UriBuilder appendPerfilQuery(UriBuilder ub, Long idPostulacion) {
+        if (idPostulacion != null) {
+            ub.queryParam("idPostulacion", idPostulacion);
+        }
+        return ub;
+    }
+
+    private static UriBuilder appendDocumentosQuery(UriBuilder ub, Long idPostulante, Long idPostulacion) {
+        ub.queryParam("idPostulante", idPostulante);
         if (idPostulacion != null) {
             ub.queryParam("idPostulacion", idPostulacion);
         }
