@@ -25,6 +25,7 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Registro
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerIdUsuarioGu;
 import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
@@ -98,14 +99,14 @@ public class PostulanteController {
     @SecurityRequirement(name = "bearer-jwt")
     @Operation(summary = "Formacion academica y experiencia laboral del postulante autenticado")
     public ApiWrapper<JsonNode> obtenerDocumentosPostulante(
-            @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
             @RequestParam(required = false) Long idPostulacion,
             @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
         String token = obtenerToken(jwt);
-        JsonNode data = postulanteService.obtenerDocumentosPostulante(postulanteId, idPostulacion, token, ipOrigen);
+        Long idUsuarioGu = obtenerIdUsuarioGu(jwt);
+        JsonNode data = postulanteService.obtenerDocumentosPostulante(idUsuarioGu, idPostulacion, token, ipOrigen);
         return ApiWrapper.success(data, "Documentos del postulante", httpRequest.getRequestURI());
     }
 

@@ -72,6 +72,16 @@ public class PostulanteClient {
         );
     }
 
+    public JsonNode obtenerIdPostulantePorUsuarioGu(Long idUsuarioGu, String token) {
+        return http.get(
+                ub -> ub.path(BASE_PATH + "/id")
+                        .queryParam("idUsuarioGu", idUsuarioGu)
+                        .build(),
+                authorizationHeader(token),
+                JsonNode.class
+        );
+    }
+
     public JsonNode obtenerHistorialCertificados(Long idPostulante, String token) {
         return http.get(
                 BASE_PATH + "/{idPostulante}/historial-certificados",
