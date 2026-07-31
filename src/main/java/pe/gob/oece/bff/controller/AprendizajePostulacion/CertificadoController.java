@@ -125,4 +125,22 @@ public class CertificadoController {
                                 .toString())
                 .body(certificadoQueryService.descargarArchivoPorExamen(idExamen, authorization));
     }
+
+    @GetMapping("/postulacion/{idPostulacion}/oficial/archivo")
+    @Operation(summary = "Descarga el certificado oficial de una postulacion")
+    @Timed(value = "certificado.postulacion.oficial.archivo")
+    public ResponseEntity<byte[]> descargarArchivoOficialPorPostulacion(
+            @PathVariable Long idPostulacion,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization
+    ) {
+        return ResponseEntity.ok()
+                .contentType(MediaType.APPLICATION_PDF)
+                .header(
+                        HttpHeaders.CONTENT_DISPOSITION,
+                        ContentDisposition.inline()
+                                .filename("certificado-postulacion-" + idPostulacion + ".pdf")
+                                .build()
+                                .toString())
+                .body(certificadoQueryService.descargarArchivoOficialPorPostulacion(idPostulacion, authorization));
+    }
 }

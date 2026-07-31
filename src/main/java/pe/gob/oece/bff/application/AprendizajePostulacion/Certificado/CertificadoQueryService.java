@@ -41,4 +41,8 @@ public class CertificadoQueryService {
     public byte[] descargarArchivoPorExamen(Long idExamen, String authorization) {
         return certificacionClient.descargarArchivoPorExamen(idExamen, authorization);
     }
+
+    public byte[] descargarArchivoOficialPorPostulacion(Long idPostulacion, String authorization) {
+        return certificacionClient.descargarArchivoOficialPorPostulacion(idPostulacion, authorization);
+    }
 }
