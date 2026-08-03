@@ -4,6 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.PostulacionClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ExperienciaLaboralRequest;
@@ -100,9 +102,14 @@ public class PostulacionesService {
         return extraerData(postulacionClient.confirmarPostulacion(idPostulacion, postulanteId, request));
     }
 
-    public JsonNode enviarSubsanacion(Long idPostulacion, JsonNode request, String token, String ipOrigen) {
+    public JsonNode enviarSubsanacion(
+            Long idPostulacion,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token,
+            String ipOrigen) {
         logger.info("AUDIT op=enviarSubsanacion idPostulacion={} ipOrigen={}", idPostulacion, ipOrigen);
-        return extraerData(postulacionClient.enviarSubsanacion(idPostulacion, request, token));
+        return extraerData(postulacionClient.enviarSubsanacion(idPostulacion, request, archivos, token));
     }
 
     public JsonNode cancelarPostulacion(JsonNode request, String ipOrigen) {

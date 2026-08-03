@@ -56,6 +56,15 @@ public class EjecucionExamenService {
         return ejecucionExamenClient.guardarRespuestas(request);
     }
 
+    public List<PreguntaExamenResponse> obtenerPreguntasExamen(List<Long> idsPreguntas, String ipOrigen) {
+        logger.info(
+                "AUDIT op=obtenerPreguntasExamen totalPreguntas={} ipOrigen={}",
+                idsPreguntas != null ? idsPreguntas.size() : 0,
+                ipOrigen
+        );
+        return ejecucionExamenClient.obtenerPreguntasExamen(idsPreguntas);
+    }
+
     public JsonNode listarCursosRecomendados(List<Long> idsCompetencia, String ipOrigen) {
         logger.info(
                 "AUDIT op=listarCursosRecomendados totalCompetencias={} ipOrigen={}",

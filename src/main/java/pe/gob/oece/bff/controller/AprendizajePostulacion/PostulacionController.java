@@ -8,8 +8,10 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,8 +21,10 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.multipart.MultipartFile;
 import pe.gob.oece.bff.application.AprendizajePostulacion.PostulacionesService;
 import pe.gob.oece.bff.config.ApiPaths;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
@@ -169,18 +173,19 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Postulación confirmada", httpRequest.getRequestURI());
     }
 
-    @PostMapping("/{idPostulacion}/subsanacion/enviar")
+    @PostMapping(value = "/{idPostulacion}/subsanacion/enviar", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Enviar subsanacion de postulacion")
     public ApiWrapper<JsonNode> enviarSubsanacion(
             @PathVariable Long idPostulacion,
-            @Valid @RequestBody JsonNode request,
+            @RequestParam MultiValueMap<String, String> request,
+            @RequestParam MultiValueMap<String, MultipartFile> archivos,
             @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
             @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
         String token = obtenerToken(jwt, authorization);
-        JsonNode data = postulacionesService.enviarSubsanacion(idPostulacion, request, token, ipOrigen);
+        JsonNode data = postulacionesService.enviarSubsanacion(idPostulacion, request, archivos, token, ipOrigen);
         return ApiWrapper.success(data, "Subsanacion enviada", httpRequest.getRequestURI());
     }
 
