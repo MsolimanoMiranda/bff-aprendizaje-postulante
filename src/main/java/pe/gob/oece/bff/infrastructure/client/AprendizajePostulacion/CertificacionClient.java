@@ -130,6 +130,18 @@ public class CertificacionClient {
         );
     }
 
+    public byte[] descargarArchivoOficialPorPostulacion(Long idPostulacion, String authorization) {
+        logger.debug("GET {} idPostulacion={}",
+                BASE_PATH + "/postulacion/{idPostulacion}/oficial/archivo",
+                idPostulacion);
+        return http.get(
+                BASE_PATH + "/postulacion/{idPostulacion}/oficial/archivo",
+                authorizationHeader(authorization),
+                byte[].class,
+                idPostulacion
+        );
+    }
+
     private Map<String, String> postulanteHeader(Long postulanteId) {
         return Map.of(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
     }

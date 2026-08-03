@@ -100,9 +100,19 @@ public class PostulacionesService {
         return extraerData(postulacionClient.confirmarPostulacion(idPostulacion, postulanteId, request));
     }
 
+    public JsonNode enviarSubsanacion(Long idPostulacion, JsonNode request, String token, String ipOrigen) {
+        logger.info("AUDIT op=enviarSubsanacion idPostulacion={} ipOrigen={}", idPostulacion, ipOrigen);
+        return extraerData(postulacionClient.enviarSubsanacion(idPostulacion, request, token));
+    }
+
     public JsonNode cancelarPostulacion(JsonNode request, String ipOrigen) {
         logger.info("AUDIT op=cancelarPostulacion ipOrigen={}", ipOrigen);
         return extraerData(postulacionClient.cancelarPostulacion(request));
+    }
+
+    public JsonNode listarPorTipoLista(String tipo, String ipOrigen) {
+        logger.info("AUDIT op=listarPorTipoLista tipo={} ipOrigen={}", tipo, ipOrigen);
+        return extraerData(postulacionClient.listarPorTipoLista(tipo));
     }
 
     private JsonNode extraerData(JsonNode response) {

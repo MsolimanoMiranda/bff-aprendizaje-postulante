@@ -25,6 +25,7 @@ import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.Registro
 import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerIdUsuarioGu;
 import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
@@ -92,6 +93,21 @@ public class PostulanteController {
         String token = obtenerToken(jwt);
         JsonNode data = postulanteService.obtenerUrlLoginAulaVirtual(token, ipOrigen);
         return ApiWrapper.success(data, "URL de acceso al Aula Virtual", httpRequest.getRequestURI());
+    }
+
+    @GetMapping("/documentos")
+    @SecurityRequirement(name = "bearer-jwt")
+    @Operation(summary = "Formacion academica y experiencia laboral del postulante autenticado")
+    public ApiWrapper<JsonNode> obtenerDocumentosPostulante(
+            @RequestParam(required = false) Long idPostulacion,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt);
+        Long idUsuarioGu = obtenerIdUsuarioGu(jwt);
+        JsonNode data = postulanteService.obtenerDocumentosPostulante(idUsuarioGu, idPostulacion, token, ipOrigen);
+        return ApiWrapper.success(data, "Documentos del postulante", httpRequest.getRequestURI());
     }
 
     @GetMapping("/{idPostulante}/historial-certificados")

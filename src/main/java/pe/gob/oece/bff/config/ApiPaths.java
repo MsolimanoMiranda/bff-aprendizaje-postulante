@@ -19,6 +19,8 @@ public final class ApiPaths {
 
     public static final String PARAMETROS = APRENDIZAJE_POSTULACION_BASE + "/parametros";
 
+    public static final String LISTAS = APRENDIZAJE_POSTULACION_BASE + "/listas";
+
     public static final String PUBLICO = APRENDIZAJE_POSTULACION_BASE + "/publico";
     public static final String CERTIFICADO = APRENDIZAJE_POSTULACION_BASE + "/certificado";
     public static final String CURSO_ASIGNADO = APRENDIZAJE_POSTULACION_BASE + "/curso-asignado";

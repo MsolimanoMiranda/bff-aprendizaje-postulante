@@ -42,6 +42,22 @@ public class PostulanteService {
         return postulanteClient.obtenerUrlLoginAulaVirtual(token);
     }
 
+    public JsonNode obtenerDocumentosPostulante(Long idUsuarioGu, Long idPostulacion, String token, String ipOrigen) {
+        Long idPostulante = resolverIdPostulante(idUsuarioGu, token);
+        logger.info("AUDIT op=obtenerDocumentosPostulante idUsuarioGu={} postulanteId={} idPostulacion={} ipOrigen={}",
+                idUsuarioGu, idPostulante, idPostulacion, ipOrigen);
+        return postulanteClient.obtenerDocumentosPostulante(idPostulante, idPostulacion, token);
+    }
+
+    private Long resolverIdPostulante(Long idUsuarioGu, String token) {
+        JsonNode response = postulanteClient.obtenerIdPostulantePorUsuarioGu(idUsuarioGu, token);
+        JsonNode idPostulante = response == null ? null : response.get("idPostulante");
+        if (idPostulante == null || !idPostulante.canConvertToLong()) {
+            throw new IllegalStateException("El MS no retorno un idPostulante valido para el usuario GU " + idUsuarioGu);
+        }
+        return idPostulante.asLong();
+    }
+
     public JsonNode obtenerHistorialCertificados(Long idPostulante, String token, String ipOrigen) {
         logger.info("AUDIT op=obtenerHistorialCertificados idPostulante={} ipOrigen={}", idPostulante, ipOrigen);
         return postulanteClient.obtenerHistorialCertificados(idPostulante, token);
