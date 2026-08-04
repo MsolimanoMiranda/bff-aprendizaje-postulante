@@ -34,6 +34,11 @@ public class PostulacionesService {
         return extraerData(postulacionClient.listarMisPostulaciones(postulanteId, token));
     }
 
+    public JsonNode listarNivelesCertificacion(String token, String ipOrigen) {
+        logger.info("AUDIT op=listarNivelesCertificacion ipOrigen={}", ipOrigen);
+        return extraerData(postulacionClient.listarNivelesCertificacion(token));
+    }
+
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId, String ipOrigen) {
         audit("obtenerDetalle", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
         return extraerData(postulacionClient.obtenerDetalle(idPostulacion, postulanteId));

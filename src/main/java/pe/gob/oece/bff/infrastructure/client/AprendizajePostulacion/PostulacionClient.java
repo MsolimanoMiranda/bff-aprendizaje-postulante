@@ -59,6 +59,10 @@ public class PostulacionClient {
         return http.get(BASE_PATH, postulanteHeader(postulanteId, token), JsonNode.class);
     }
 
+    public JsonNode listarNivelesCertificacion(String token) {
+        return http.get(BASE_PATH + "/niveles-certificacion", bearerHeader(token), JsonNode.class);
+    }
+
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId) {
         return http.get(
                 BASE_PATH + "/{idPostulacion}",

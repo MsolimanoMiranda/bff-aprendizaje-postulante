@@ -78,6 +78,19 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Postulaciones del postulante", httpRequest.getRequestURI());
     }
 
+    @GetMapping("/niveles-certificacion")
+    @Operation(summary = "Listar niveles de certificacion")
+    public ApiWrapper<JsonNode> listarNivelesCertificacion(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.listarNivelesCertificacion(token, ipOrigen);
+        return ApiWrapper.success(data, "Niveles de certificacion", httpRequest.getRequestURI());
+    }
+
     @GetMapping("/{idPostulacion}")
     @Operation(summary = "Ver detalle de postulación")
     public ApiWrapper<JsonNode> obtenerDetalle(
