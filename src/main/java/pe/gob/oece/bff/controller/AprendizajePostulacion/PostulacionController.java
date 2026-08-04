@@ -103,32 +103,40 @@ public class PostulacionController {
         return ApiWrapper.success(data, "Detalle de postulación", httpRequest.getRequestURI());
     }
 
-    @PostMapping("/{idPostulacion}/experiencias")
+    @PostMapping(value = "/{idPostulacion}/experiencias", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @ResponseStatus(HttpStatus.CREATED)
     @Operation(summary = "Paso 1B: Agregar experiencia laboral")
     public ApiWrapper<JsonNode> agregarExperiencia(
             @PathVariable Long idPostulacion,
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
-            @Valid @RequestBody ExperienciaLaboralRequest request,
+            @RequestParam MultiValueMap<String, String> request,
+            @RequestParam(required = false) MultiValueMap<String, MultipartFile> archivos,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
-        JsonNode data = postulacionesService.agregarExperiencia(idPostulacion, postulanteId, request, ipOrigen);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.agregarExperiencia(idPostulacion, postulanteId, request, archivos, token, ipOrigen);
         return ApiWrapper.created(data, "Experiencia laboral agregada", httpRequest.getRequestURI());
     }
 
-    @PutMapping("/{idPostulacion}/experiencias/{idExperiencia}")
+    @PutMapping(value = "/{idPostulacion}/experiencias/{idExperiencia}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     @Operation(summary = "Paso 1B: Editar experiencia laboral")
     public ApiWrapper<JsonNode> editarExperiencia(
             @PathVariable Long idPostulacion,
             @PathVariable Long idExperiencia,
             @RequestHeader(HEADER_POSTULANTE_ID) Long postulanteId,
-            @Valid @RequestBody ExperienciaLaboralRequest request,
+            @RequestParam MultiValueMap<String, String> request,
+            @RequestParam(required = false) MultiValueMap<String, MultipartFile> archivos,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt, authorization);
         JsonNode data = postulacionesService.editarExperiencia(
-                idPostulacion, idExperiencia, postulanteId, request, ipOrigen
+                idPostulacion, idExperiencia, postulanteId, request, archivos, token, ipOrigen
         );
         return ApiWrapper.success(data, "Experiencia laboral actualizada", httpRequest.getRequestURI());
     }

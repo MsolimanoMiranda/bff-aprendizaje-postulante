@@ -189,6 +189,9 @@ public class GlobalExceptionHandler {
         if (upstreamStatus == HttpStatus.FORBIDDEN.value()) {
             return HttpStatus.FORBIDDEN;
         }
+        if (upstreamStatus == HttpStatus.REQUEST_TIMEOUT.value()) {
+            return HttpStatus.REQUEST_TIMEOUT;
+        }
         if (upstreamStatus >= 500) {
             return HttpStatus.BAD_GATEWAY;
         }
