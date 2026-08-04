@@ -172,6 +172,17 @@ public class EjecucionExamenController {
         return ApiWrapper.success(data, "Respuestas del examen guardadas", httpRequest.getRequestURI());
     }
 
+    @PostMapping("/examen/obtener-preguntas-examen")
+    @Operation(summary = "Obtener preguntas del examen por ids")
+    public ApiWrapper<List<PreguntaExamenResponse>> obtenerPreguntasExamen(
+            @RequestBody List<Long> idsPreguntas,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        List<PreguntaExamenResponse> data = ejecucionExamenService.obtenerPreguntasExamen(idsPreguntas, ipOrigen);
+        return ApiWrapper.success(data, "Preguntas obtenidas con exito", httpRequest.getRequestURI());
+    }
+
     @PostMapping("/examen/cursos-recomendados")
     @Operation(summary = "Listar cursos recomendados por competencias")
     public ApiWrapper<JsonNode> listarCursosRecomendados(

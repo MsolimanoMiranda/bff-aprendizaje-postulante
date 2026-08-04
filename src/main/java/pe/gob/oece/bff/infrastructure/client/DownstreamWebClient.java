@@ -87,6 +87,22 @@ public final class DownstreamWebClient {
     }
 
     public <T> T post(
+            String uri,
+            Object body,
+            Map<String, String> headers,
+            ParameterizedTypeReference<T> responseType,
+            Object... uriVars
+    ) {
+        return decode(
+                retrieveWithBody(
+                        webClient.post().uri(uri, uriVars).headers(applyHeaders(headers)),
+                        body
+                ),
+                responseType
+        );
+    }
+
+    public <T> T post(
             Function<UriBuilder, URI> uriFunction,
             Object body,
             Map<String, String> headers,

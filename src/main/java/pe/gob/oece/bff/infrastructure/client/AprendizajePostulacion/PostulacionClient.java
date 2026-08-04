@@ -1,10 +1,18 @@
 package pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import java.io.IOException;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatusCode;
+import org.springframework.http.MediaType;
+import org.springframework.http.client.MultipartBodyBuilder;
 import org.springframework.stereotype.Component;
+import org.springframework.util.MultiValueMap;
+import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.reactive.function.BodyInserters;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
@@ -25,15 +33,21 @@ public class PostulacionClient {
     private static final String HEADER_POSTULANTE_ID = "X-Postulante-Id";
 
     private final DownstreamWebClient http;
+    private final WebClient webClient;
+    private final Duration timeout;
+    private final DownstreamClientErrorHandler errorHandler;
 
     public PostulacionClient(
             @Qualifier("aprendizajePostulacionWebClient") WebClient webClient,
             @Value("${app.clients.aprendizaje-postulacion.response-timeout-ms:8000}") long timeoutMs
     ) {
+        this.webClient = webClient;
+        this.timeout = Duration.ofMillis(timeoutMs);
+        this.errorHandler = new DownstreamClientErrorHandler("aprendizaje-postulacion", "ERROR-AP-PL-EX");
         this.http = new DownstreamWebClient(
                 webClient,
-                Duration.ofMillis(timeoutMs),
-                new DownstreamClientErrorHandler("aprendizaje-postulacion", "ERROR-AP-PL-EX")
+                this.timeout,
+                this.errorHandler
         );
     }
 
@@ -43,6 +57,10 @@ public class PostulacionClient {
 
     public JsonNode listarMisPostulaciones(Long postulanteId, String token) {
         return http.get(BASE_PATH, postulanteHeader(postulanteId, token), JsonNode.class);
+    }
+
+    public JsonNode listarNivelesCertificacion(String token) {
+        return http.get(BASE_PATH + "/niveles-certificacion", bearerHeader(token), JsonNode.class);
     }
 
     public JsonNode obtenerDetalle(Long idPostulacion, Long postulanteId) {
@@ -132,14 +150,40 @@ public class PostulacionClient {
         );
     }
 
-    public JsonNode enviarSubsanacion(Long idPostulacion, JsonNode request, String token) {
-        return http.post(
-                BASE_PATH + "/{idPostulacion}/subsanacion/enviar",
-                request,
-                bearerHeader(token),
-                JsonNode.class,
-                idPostulacion
-        );
+    public JsonNode enviarSubsanacion(
+            Long idPostulacion,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        MultipartBodyBuilder body = new MultipartBodyBuilder();
+        if (request != null) {
+            request.forEach((name, values) -> values.forEach(value -> body.part(name, value)));
+        }
+        if (archivos != null) {
+            archivos.forEach((name, values) -> values.stream()
+                    .filter(archivo -> archivo != null && !archivo.isEmpty())
+                    .forEach(archivo -> body.part(name, recursoArchivo(archivo))
+                            .filename(archivo.getOriginalFilename() == null ? "archivo" : archivo.getOriginalFilename())
+                            .contentType(archivo.getContentType() == null
+                                    ? MediaType.APPLICATION_OCTET_STREAM
+                                    : MediaType.parseMediaType(archivo.getContentType()))));
+        }
+
+        return webClient.post()
+                .uri(BASE_PATH + "/{idPostulacion}/subsanacion/enviar", idPostulacion)
+                .headers(headers -> {
+                    Map<String, String> authorizationHeader = bearerHeader(token);
+                    if (authorizationHeader != null) {
+                        authorizationHeader.forEach(headers::set);
+                    }
+                })
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(body.build()))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, errorHandler::toError)
+                .bodyToMono(JsonNode.class)
+                .timeout(timeout)
+                .block();
     }
 
     public JsonNode cancelarPostulacion(JsonNode request) {
@@ -162,6 +206,23 @@ public class PostulacionClient {
     }
 
     private Map<String, String> bearerHeader(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
         return Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token);
+    }
+
+    private static ByteArrayResource recursoArchivo(MultipartFile archivo) {
+        try {
+            byte[] bytes = archivo.getBytes();
+            return new ByteArrayResource(bytes) {
+                @Override
+                public String getFilename() {
+                    return archivo.getOriginalFilename() == null ? "archivo" : archivo.getOriginalFilename();
+                }
+            };
+        } catch (IOException ex) {
+            throw new IllegalArgumentException("No se pudo leer el archivo de subsanacion", ex);
+        }
     }
 }

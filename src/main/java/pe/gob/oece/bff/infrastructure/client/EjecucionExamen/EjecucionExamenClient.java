@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -49,6 +50,15 @@ public class EjecucionExamenClient {
 
     public JsonNode guardarRespuestas(GuardarRespuestasRequest request) {
         return http.post(BASE_PATH + "/examen/guardar-respuestas", request, authorizationHeader(), JsonNode.class);
+    }
+
+    public List<PreguntaExamenResponse> obtenerPreguntasExamen(List<Long> idsPreguntas) {
+        return http.post(
+                BASE_PATH + "/examen/obtener-preguntas-examen",
+                idsPreguntas,
+                authorizationHeader(),
+                new ParameterizedTypeReference<List<PreguntaExamenResponse>>() {
+                });
     }
 
     public JsonNode listarCursosRecomendados(List<Long> idsCompetencia) {
