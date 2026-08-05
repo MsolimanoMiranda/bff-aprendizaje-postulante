@@ -17,7 +17,6 @@ import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ExperienciaLaboralRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.GenerarOrdenPagoRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.IniciarPostulacionRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.SeleccionarProgramacionRequest;
@@ -29,6 +28,7 @@ import java.util.Map;
 public class PostulacionClient {
 
     private static final String BASE_PATH = "/api/v1/postulaciones";
+    private static final String FORMACION_ACADEMICA_BASE_PATH = "/api/v1/formacion-academica";
     private static final String LISTAS_BASE_PATH = "/api/v1/listas";
     private static final String HEADER_POSTULANTE_ID = "X-Postulante-Id";
 
@@ -72,30 +72,58 @@ public class PostulacionClient {
         );
     }
 
-    public JsonNode agregarExperiencia(Long idPostulacion, Long postulanteId, ExperienciaLaboralRequest request) {
-        return http.post(
-                BASE_PATH + "/{idPostulacion}/experiencias",
-                request,
-                postulanteHeader(postulanteId),
-                JsonNode.class,
-                idPostulacion
-        );
+    public JsonNode agregarExperiencia(
+            Long idPostulacion,
+            Long postulanteId,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        return enviarExperiencia("POST", idPostulacion, null, postulanteId, request, archivos, token);
     }
 
     public JsonNode editarExperiencia(
             Long idPostulacion,
             Long idExperiencia,
             Long postulanteId,
-            ExperienciaLaboralRequest request
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token
     ) {
-        return http.put(
-                BASE_PATH + "/{idPostulacion}/experiencias/{idExperiencia}",
-                request,
-                postulanteHeader(postulanteId),
-                JsonNode.class,
-                idPostulacion,
-                idExperiencia
-        );
+        return enviarExperiencia("PUT", idPostulacion, idExperiencia, postulanteId, request, archivos, token);
+    }
+
+    private JsonNode enviarExperiencia(
+            String method,
+            Long idPostulacion,
+            Long idExperiencia,
+            Long postulanteId,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        MultipartBodyBuilder body = multipartBody(request, archivos);
+        String uri = idExperiencia == null
+                ? BASE_PATH + "/{idPostulacion}/experiencias"
+                : BASE_PATH + "/{idPostulacion}/experiencias/{idExperiencia}";
+
+        WebClient.RequestBodySpec spec = "PUT".equals(method)
+                ? webClient.put().uri(uri, idPostulacion, idExperiencia)
+                : webClient.post().uri(uri, idPostulacion);
+
+        return spec
+                .headers(headers -> {
+                    headers.set(HEADER_POSTULANTE_ID, String.valueOf(postulanteId));
+                    Map<String, String> authorizationHeader = bearerHeader(token);
+                    if (authorizationHeader != null) {
+                        authorizationHeader.forEach(headers::set);
+                    }
+                })
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(body.build()))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, errorHandler::toError)
+                .bodyToMono(JsonNode.class)
+                .timeout(timeout)
+                .block();
     }
 
     public JsonNode eliminarExperiencia(Long idPostulacion, Long idExperiencia, Long postulanteId) {
@@ -105,6 +133,61 @@ public class PostulacionClient {
                 JsonNode.class,
                 idPostulacion,
                 idExperiencia
+        );
+    }
+
+    public JsonNode agregarFormacion(
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        return enviarFormacion("POST", null, request, archivos, token);
+    }
+
+    public JsonNode editarFormacion(
+            Long idFormacion,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        return enviarFormacion("PUT", idFormacion, request, archivos, token);
+    }
+
+    private JsonNode enviarFormacion(
+            String method,
+            Long idFormacion,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token) {
+        MultipartBodyBuilder body = multipartBody(request, archivos);
+        String uri = idFormacion == null
+                ? FORMACION_ACADEMICA_BASE_PATH
+                : FORMACION_ACADEMICA_BASE_PATH + "/{idFormacion}";
+
+        WebClient.RequestBodySpec spec = "PUT".equals(method)
+                ? webClient.put().uri(uri, idFormacion)
+                : webClient.post().uri(uri);
+
+        return spec
+                .headers(headers -> {
+                    Map<String, String> authorizationHeader = bearerHeader(token);
+                    if (authorizationHeader != null) {
+                        authorizationHeader.forEach(headers::set);
+                    }
+                })
+                .contentType(MediaType.MULTIPART_FORM_DATA)
+                .body(BodyInserters.fromMultipartData(body.build()))
+                .retrieve()
+                .onStatus(HttpStatusCode::isError, errorHandler::toError)
+                .bodyToMono(JsonNode.class)
+                .timeout(timeout)
+                .block();
+    }
+
+    public JsonNode eliminarFormacion(Long idFormacion) {
+        return http.delete(
+                FORMACION_ACADEMICA_BASE_PATH + "/{idFormacion}",
+                null,
+                JsonNode.class,
+                idFormacion
         );
     }
 
@@ -155,20 +238,7 @@ public class PostulacionClient {
             MultiValueMap<String, String> request,
             MultiValueMap<String, MultipartFile> archivos,
             String token) {
-        MultipartBodyBuilder body = new MultipartBodyBuilder();
-        if (request != null) {
-            request.forEach((name, values) -> values.forEach(value -> body.part(name, value)));
-        }
-        if (archivos != null) {
-            archivos.forEach((name, values) -> values.stream()
-                    .filter(archivo -> archivo != null && !archivo.isEmpty())
-                    .forEach(archivo -> body.part(name, recursoArchivo(archivo))
-                            .filename(archivo.getOriginalFilename() == null ? "archivo" : archivo.getOriginalFilename())
-                            .contentType(archivo.getContentType() == null
-                                    ? MediaType.APPLICATION_OCTET_STREAM
-                                    : MediaType.parseMediaType(archivo.getContentType()))));
-        }
-
+        MultipartBodyBuilder body = multipartBody(request, archivos);
         return webClient.post()
                 .uri(BASE_PATH + "/{idPostulacion}/subsanacion/enviar", idPostulacion)
                 .headers(headers -> {
@@ -184,6 +254,25 @@ public class PostulacionClient {
                 .bodyToMono(JsonNode.class)
                 .timeout(timeout)
                 .block();
+    }
+
+    private MultipartBodyBuilder multipartBody(
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos) {
+        MultipartBodyBuilder body = new MultipartBodyBuilder();
+        if (request != null) {
+            request.forEach((name, values) -> values.forEach(value -> body.part(name, value)));
+        }
+        if (archivos != null) {
+            archivos.forEach((name, values) -> values.stream()
+                    .filter(archivo -> archivo != null && !archivo.isEmpty())
+                    .forEach(archivo -> body.part(name, recursoArchivo(archivo))
+                            .filename(archivo.getOriginalFilename() == null ? "archivo" : archivo.getOriginalFilename())
+                            .contentType(archivo.getContentType() == null
+                                    ? MediaType.APPLICATION_OCTET_STREAM
+                                    : MediaType.parseMediaType(archivo.getContentType()))));
+        }
+        return body;
     }
 
     public JsonNode cancelarPostulacion(JsonNode request) {

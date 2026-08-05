@@ -8,7 +8,6 @@ import org.springframework.util.MultiValueMap;
 import org.springframework.web.multipart.MultipartFile;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.PostulacionClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ConfirmarPostulacionRequest;
-import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.ExperienciaLaboralRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.GenerarOrdenPagoRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.IniciarPostulacionRequest;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.SeleccionarProgramacionRequest;
@@ -47,23 +46,27 @@ public class PostulacionesService {
     public JsonNode agregarExperiencia(
             Long idPostulacion,
             Long postulanteId,
-            ExperienciaLaboralRequest request,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token,
             String ipOrigen
     ) {
         audit("agregarExperiencia", postulanteId, ipOrigen, "idPostulacion=" + idPostulacion);
-        return extraerData(postulacionClient.agregarExperiencia(idPostulacion, postulanteId, request));
+        return extraerData(postulacionClient.agregarExperiencia(idPostulacion, postulanteId, request, archivos, token));
     }
 
     public JsonNode editarExperiencia(
             Long idPostulacion,
             Long idExperiencia,
             Long postulanteId,
-            ExperienciaLaboralRequest request,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token,
             String ipOrigen
     ) {
         audit("editarExperiencia", postulanteId, ipOrigen,
                 "idPostulacion=" + idPostulacion, "idExperiencia=" + idExperiencia);
-        return extraerData(postulacionClient.editarExperiencia(idPostulacion, idExperiencia, postulanteId, request));
+        return extraerData(postulacionClient.editarExperiencia(idPostulacion, idExperiencia, postulanteId, request, archivos, token));
     }
 
     public JsonNode eliminarExperiencia(
@@ -75,6 +78,32 @@ public class PostulacionesService {
         audit("eliminarExperiencia", postulanteId, ipOrigen,
                 "idPostulacion=" + idPostulacion, "idExperiencia=" + idExperiencia);
         return extraerData(postulacionClient.eliminarExperiencia(idPostulacion, idExperiencia, postulanteId));
+    }
+
+    public JsonNode agregarFormacion(
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token,
+            String ipOrigen
+    ) {
+        logger.info("AUDIT op=agregarFormacion ipOrigen={}", ipOrigen);
+        return extraerData(postulacionClient.agregarFormacion(request, archivos, token));
+    }
+
+    public JsonNode editarFormacion(
+            Long idFormacion,
+            MultiValueMap<String, String> request,
+            MultiValueMap<String, MultipartFile> archivos,
+            String token,
+            String ipOrigen
+    ) {
+        logger.info("AUDIT op=editarFormacion idFormacion={} ipOrigen={}", idFormacion, ipOrigen);
+        return extraerData(postulacionClient.editarFormacion(idFormacion, request, archivos, token));
+    }
+
+    public JsonNode eliminarFormacion(Long idFormacion, String ipOrigen) {
+        logger.info("AUDIT op=eliminarFormacion idFormacion={} ipOrigen={}", idFormacion, ipOrigen);
+        return extraerData(postulacionClient.eliminarFormacion(idFormacion));
     }
 
     public JsonNode seleccionarProgramacion(

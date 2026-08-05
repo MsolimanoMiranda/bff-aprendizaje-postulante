@@ -13,6 +13,8 @@ public final class ApiPaths {
 
     public static final String POSTULACIONES = APRENDIZAJE_POSTULACION_BASE + "/postulaciones";
 
+    public static final String FORMACION_ACADEMICA = APRENDIZAJE_POSTULACION_BASE + "/formacion-academica";
+
     public static final String DETALLE_POSTULACION = POSTULACIONES;
 
     public static final String POSTULANTE = APRENDIZAJE_POSTULACION_BASE + "/postulante";
