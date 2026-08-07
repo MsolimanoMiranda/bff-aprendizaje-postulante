@@ -36,6 +36,7 @@ import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
 import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerUsuario;
 
 @RestController
 @RequestMapping(ApiPaths.POSTULACIONES)
@@ -89,6 +90,19 @@ public class PostulacionController {
         String token = obtenerToken(jwt, authorization);
         JsonNode data = postulacionesService.listarNivelesCertificacion(token, ipOrigen);
         return ApiWrapper.success(data, "Niveles de certificacion", httpRequest.getRequestURI());
+    }
+
+    @GetMapping("/avisos")
+    @Operation(summary = "Obtener avisos de postulaciones")
+    public ApiWrapper<JsonNode> obtenerAvisosPostulacion(
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
+            @AuthenticationPrincipal Jwt jwt,
+            HttpServletRequest httpRequest
+    ) {
+        String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = postulacionesService.obtenerAvisosPostulacion(token, ipOrigen);
+        return ApiWrapper.success(data, "Avisos de postulaciones", httpRequest.getRequestURI());
     }
 
     @GetMapping("/{idPostulacion}")
@@ -205,8 +219,10 @@ public class PostulacionController {
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
+        String usuario = obtenerUsuario(jwt);
         String token = obtenerToken(jwt, authorization);
-        JsonNode data = postulacionesService.enviarSubsanacion(idPostulacion, request, archivos, token, ipOrigen);
+        JsonNode data = postulacionesService.enviarSubsanacion(
+                idPostulacion, request, archivos, token, usuario, ipOrigen);
         return ApiWrapper.success(data, "Subsanacion enviada", httpRequest.getRequestURI());
     }
 

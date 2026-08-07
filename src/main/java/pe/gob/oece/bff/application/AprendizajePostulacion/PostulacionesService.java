@@ -33,6 +33,11 @@ public class PostulacionesService {
         return extraerData(postulacionClient.listarMisPostulaciones(postulanteId, token));
     }
 
+    public JsonNode obtenerAvisosPostulacion(String token, String ipOrigen) {
+        logger.info("AUDIT op=obtenerAvisosPostulacion ipOrigen={}", ipOrigen);
+        return extraerData(postulacionClient.obtenerAvisosPostulacion(token));
+    }
+
     public JsonNode listarNivelesCertificacion(String token, String ipOrigen) {
         logger.info("AUDIT op=listarNivelesCertificacion ipOrigen={}", ipOrigen);
         return extraerData(postulacionClient.listarNivelesCertificacion(token));
@@ -141,9 +146,12 @@ public class PostulacionesService {
             MultiValueMap<String, String> request,
             MultiValueMap<String, MultipartFile> archivos,
             String token,
+            String usuario,
             String ipOrigen) {
-        logger.info("AUDIT op=enviarSubsanacion idPostulacion={} ipOrigen={}", idPostulacion, ipOrigen);
-        return extraerData(postulacionClient.enviarSubsanacion(idPostulacion, request, archivos, token));
+        logger.info("AUDIT op=enviarSubsanacion idPostulacion={} usuario={} ipOrigen={}",
+                idPostulacion, usuario, ipOrigen);
+        return extraerData(postulacionClient.enviarSubsanacion(
+                idPostulacion, request, archivos, token, usuario, ipOrigen));
     }
 
     public JsonNode cancelarPostulacion(JsonNode request, String ipOrigen) {
