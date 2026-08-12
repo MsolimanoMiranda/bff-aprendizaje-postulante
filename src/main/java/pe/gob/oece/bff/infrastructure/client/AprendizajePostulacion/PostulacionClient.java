@@ -59,6 +59,10 @@ public class PostulacionClient {
         return http.get(BASE_PATH, postulanteHeader(postulanteId, token), JsonNode.class);
     }
 
+    public JsonNode obtenerAvisosPostulacion(String token) {
+        return http.get(BASE_PATH + "/avisos", bearerHeader(token), JsonNode.class);
+    }
+
     public JsonNode listarNivelesCertificacion(String token) {
         return http.get(BASE_PATH + "/niveles-certificacion", bearerHeader(token), JsonNode.class);
     }
@@ -237,10 +241,16 @@ public class PostulacionClient {
             Long idPostulacion,
             MultiValueMap<String, String> request,
             MultiValueMap<String, MultipartFile> archivos,
-            String token) {
+            String token,
+            String usuario,
+            String ipOrigen) {
         MultipartBodyBuilder body = multipartBody(request, archivos);
         return webClient.post()
-                .uri(BASE_PATH + "/{idPostulacion}/subsanacion/enviar", idPostulacion)
+                .uri(uriBuilder -> uriBuilder
+                        .path(BASE_PATH + "/{idPostulacion}/subsanacion/enviar")
+                        .queryParam("usuario", usuario)
+                        .queryParam("ip", ipOrigen)
+                        .build(idPostulacion))
                 .headers(headers -> {
                     Map<String, String> authorizationHeader = bearerHeader(token);
                     if (authorizationHeader != null) {
