@@ -4,12 +4,14 @@ import com.fasterxml.jackson.databind.JsonNode;
 import java.time.Duration;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import pe.gob.oece.bff.infrastructure.client.DownstreamClientErrorHandler;
 import pe.gob.oece.bff.infrastructure.client.DownstreamWebClient;
 import pe.gob.oece.bff.infrastructure.client.AprendizajePostulacion.dto.encuesta.EncuestaRespuestaRequest;
 
+import java.util.HashMap;
 import java.util.Map;
 
 @Component
@@ -35,12 +37,35 @@ public class EncuestaSatisfaccionClient {
         return http.get(BASE_PATH + "/formulario-activo", null, JsonNode.class);
     }
 
-    public JsonNode registrarRespuesta(Long idUsuarioGu, EncuestaRespuestaRequest request) {
+    public JsonNode registrarRespuesta(Long idUsuarioGu, EncuestaRespuestaRequest request,String token) {
+
+        Map<String, String> headers = new HashMap<>();
+
+        headers.put(
+                HEADER_POSTULANTE_ID,
+                String.valueOf(idUsuarioGu)
+        );
+
+        Map<String, String> authorizationHeader =
+                bearerHeader(token);
+
+        if (authorizationHeader != null) {
+            headers.putAll(authorizationHeader);
+        }
+
         return http.post(
                 BASE_PATH + "/respuestas",
                 request,
-                Map.of(HEADER_POSTULANTE_ID, String.valueOf(idUsuarioGu)),
+                headers,
                 JsonNode.class
         );
+    }
+
+
+    private Map<String, String> bearerHeader(String token) {
+        if (token == null || token.isBlank()) {
+            return null;
+        }
+        return Map.of(HttpHeaders.AUTHORIZATION, "Bearer " + token);
     }
 }
