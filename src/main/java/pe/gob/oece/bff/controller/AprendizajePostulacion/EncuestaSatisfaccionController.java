@@ -60,6 +60,8 @@ public class EncuestaSatisfaccionController {
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
         Long idUsuarioGu = obtenerIdUsuarioGu(jwt);
+        System.out.println("idUsuarioGu" + idUsuarioGu);
+        System.out.println("request" + request.toString());
         JsonNode data = encuestaSatisfaccionCommandService.registrarRespuesta(idUsuarioGu, request, ipOrigen);
         return ApiWrapper.created(data, "Encuesta de satisfaccion registrada", httpRequest.getRequestURI());
     }

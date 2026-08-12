@@ -23,7 +23,7 @@ public class EncuestaSatisfaccionCommandService {
                 "AUDIT op=registrarRespuestaEncuestaSatisfaccion idUsuarioGu={} ipOrigen={} idFormulario={}",
                 idUsuarioGu,
                 ipOrigen,
-                request.idFormulario()
+                request.toString()
         );
         return encuestaSatisfaccionClient.registrarRespuesta(idUsuarioGu, request);
     }
