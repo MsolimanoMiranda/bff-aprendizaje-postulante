@@ -18,13 +18,14 @@ public class EncuestaSatisfaccionCommandService {
         this.encuestaSatisfaccionClient = encuestaSatisfaccionClient;
     }
 
-    public JsonNode registrarRespuesta(Long idUsuarioGu, EncuestaRespuestaRequest request, String ipOrigen) {
+    public JsonNode registrarRespuesta(Long idUsuarioGu, EncuestaRespuestaRequest request, String ipOrigen,String token) {
         logger.info(
-                "AUDIT op=registrarRespuestaEncuestaSatisfaccion idUsuarioGu={} ipOrigen={} idFormulario={}",
+                "AUDIT op=registrarRespuestaEncuestaSatisfaccion idUsuarioGu={} ipOrigen={} idFormulario={}  token={}",
                 idUsuarioGu,
                 ipOrigen,
-                request.toString()
+                request.toString(),
+                  token
         );
-        return encuestaSatisfaccionClient.registrarRespuesta(idUsuarioGu, request);
+        return encuestaSatisfaccionClient.registrarRespuesta(idUsuarioGu, request,token);
     }
 }

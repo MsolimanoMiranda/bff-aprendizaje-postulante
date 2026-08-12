@@ -6,16 +6,11 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.validation.Valid;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.oauth2.jwt.Jwt;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import pe.gob.oece.bff.application.AprendizajePostulacion.EncuestaSatisfaccion.EncuestaSatisfaccionCommandService;
 import pe.gob.oece.bff.application.AprendizajePostulacion.EncuestaSatisfaccion.EncuestaSatisfaccionQueryService;
 import pe.gob.oece.bff.config.ApiPaths;
@@ -24,6 +19,7 @@ import pe.gob.oece.bff.shared.ApiWrapper;
 import pe.gob.oece.bff.shared.HttpRequestUtils;
 
 import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerIdUsuarioGu;
+import static pe.gob.oece.bff.controller.helpers.JwtControllerHelper.obtenerToken;
 
 @RestController
 @RequestMapping(ApiPaths.ENCUESTA_SATISFACCION)
@@ -56,13 +52,13 @@ public class EncuestaSatisfaccionController {
     public ApiWrapper<JsonNode> registrarRespuesta(
             @AuthenticationPrincipal Jwt jwt,
             @Valid @RequestBody EncuestaRespuestaRequest request,
+            @RequestHeader(value = HttpHeaders.AUTHORIZATION, required = false) String authorization,
             HttpServletRequest httpRequest
     ) {
         String ipOrigen = HttpRequestUtils.obtenerIpOrigen(httpRequest);
         Long idUsuarioGu = obtenerIdUsuarioGu(jwt);
-        System.out.println("idUsuarioGu" + idUsuarioGu);
-        System.out.println("request" + request.toString());
-        JsonNode data = encuestaSatisfaccionCommandService.registrarRespuesta(idUsuarioGu, request, ipOrigen);
+        String token = obtenerToken(jwt, authorization);
+        JsonNode data = encuestaSatisfaccionCommandService.registrarRespuesta(idUsuarioGu, request, ipOrigen,token);
         return ApiWrapper.created(data, "Encuesta de satisfaccion registrada", httpRequest.getRequestURI());
     }
 
