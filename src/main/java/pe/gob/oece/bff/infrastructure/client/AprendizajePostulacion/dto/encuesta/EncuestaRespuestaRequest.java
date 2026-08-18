@@ -7,6 +7,7 @@ import java.util.List;
 
 public record EncuestaRespuestaRequest(
         @NotNull Long idFormulario,
+        @NotNull Long idInscripcion,
         @Valid @NotEmpty List<EncuestaRespuestaDetalleRequest> respuestas
 ) {
 }
